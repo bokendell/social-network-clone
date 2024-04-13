@@ -12,6 +12,8 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        username: '',
+        dob: '',
     });
 
     useEffect(() => {
@@ -49,6 +51,23 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
+                    <InputLabel htmlFor="username" value="Username" />
+
+                    <TextInput
+                        id="username"
+                        type="text"
+                        name="username"
+                        value={data.username}
+                        className="mt-1 block w-full"
+                        autoComplete="username"
+                        onChange={(e) => setData('username', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.username} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
 
                     <TextInput
@@ -63,6 +82,23 @@ export default function Register() {
                     />
 
                     <InputError message={errors.email} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="dob" value="Date of Birth" />
+
+                    <TextInput
+                        id="dob"
+                        type="date"
+                        name="dob"
+                        value={data.dob}
+                        className="mt-1 block w-full"
+                        autoComplete="dob"
+                        onChange={(e) => setData('dob', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.dob} className="mt-2" />
                 </div>
 
                 <div className="mt-4">

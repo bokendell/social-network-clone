@@ -34,7 +34,6 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:'.User::class,
             'dob' => 'required|date',
-            'status' => 'required|string|in:active,inactive,pending',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -43,7 +42,6 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'dob' => $request->dob,
-            'status' => $request->status,
             'username' => $request->username,
             'password' => Hash::make($request->password),
         ]);

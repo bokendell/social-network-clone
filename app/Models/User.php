@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use InvalidArgumentException;
 
 class User extends Authenticatable
 {
@@ -18,8 +19,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'dob',
+        'username',
         'email',
+        'status',
         'password',
+
     ];
 
     /**
@@ -42,6 +47,67 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'dob' => 'date',
+            'status' => 'string'
         ];
+    }
+
+    public function setStatusAttribute($value)
+    {
+        $validStatuses = ['active', 'inactive', 'pending'];
+        if (in_array($value, $validStatuses)) {
+            $this->attributes['status'] = $value;
+        } else {
+            throw new InvalidArgumentException("Invalid status value");
+        }
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
+
+    public function reposts()
+    {
+        return $this->hasMany(Repost::class);
+    }
+
+    public function sentRequests()
+    {
+        return $this->hasMany(Friend::class, 'requester_id');
+    }
+
+    public function receivedRequests()
+    {
+        return $this->hasMany(Friend::class, 'accepter_id');
+    }
+
+    public function friends()
+    {
+        $sentRequests = $this->sentRequests()->where('status', 'accepted')->get();
+        $receivedRequests = $this->receivedRequests()->where('status', 'accepted')->get();
+        $friends = $sentRequests->merge($receivedRequests);
+
+        return $friends;
     }
 }

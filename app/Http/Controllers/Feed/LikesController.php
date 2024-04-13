@@ -10,6 +10,13 @@ use Illuminate\Http\JsonResponse;
 class LikesController extends Controller
 {
     /**
+     * @OA\Get(
+     *      path="/feed/posts/{post}/likes",
+     *      summary="Get likes for a post.",
+     *      tags={"Likes"},
+     *      @OA\Response(response=200, description="Post likes", @OA\JsonContent())
+     * )
+     *
      * Get likes for a post.
      *
      * @param Request $request

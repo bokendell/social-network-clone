@@ -1,0 +1,35 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Social Network Clone",
+        "description": "Social Network Clone API Documentation",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/feed/posts/{post}/likes": {
+            "get": {
+                "tags": [
+                    "Likes"
+                ],
+                "summary": "Get likes for a post.",
+                "operationId": "6624ed06ec262231b9450c60738c979c",
+                "responses": {
+                    "200": {
+                        "description": "Post likes",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Likes",
+            "description": "Operations related to likes"
+        }
+    ]
+}

@@ -32,7 +32,7 @@ This project was made in hopes of getting exposed to PHP and its different frame
 #### react
 
 ## Documentation
-
+- api documentation made using swagger at /api/documentation
 
 ## Re use
 Feel free to use any of the code in this repo as you need

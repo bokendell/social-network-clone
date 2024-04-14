@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Friend;
 use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -23,5 +26,6 @@ class DatabaseSeeder extends Seeder
             RepostsTableSeeder::class,
             FriendsTableSeeder::class,
         ]);
+        UsersTableSeeder::createAdmin();
     }
 }

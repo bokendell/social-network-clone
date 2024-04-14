@@ -9,6 +9,14 @@ class Friend extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'requester_id',
+        'accepter_id',
+        'status',
+    ];
+
+    
+
     public function requester()
     {
         return $this->belongsTo(User::class, 'requester_id');

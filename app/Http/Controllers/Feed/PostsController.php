@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\JsonResponse;
 use App\Models\Post;
+use Illuminate\Database\Eloquent\Casts\Json;
 
 class PostsController extends Controller
 {
@@ -25,7 +26,8 @@ class PostsController extends Controller
             ->with('user')
             ->latest()
             ->paginate(10);
-        return JsonResponse::create($posts);
+
+        return response()->json($posts);
     }
 
     /**
@@ -34,12 +36,15 @@ class PostsController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function createPost(Post $post): JsonResponse {
+    public function createPost(): JsonResponse {
+        if (request('content') === null){
+            return response()->json(['message' => 'Content cannot be empty'], 400);
+        }
         $post = Post::create([
             'user_id' => auth()->id(),
             'content' => request('content')
         ]);
-        return JsonResponse::create($post);
+        return response()->json($post);
     }
 
     /**
@@ -48,9 +53,20 @@ class PostsController extends Controller
      * @param Post $post
      * @return JsonResponse
      */
-    public function deletePost(Post $post): JsonResponse {
+    public function deletePost($postID): JsonResponse {
+        $post = Post::find($postID);
+        if ($post === null){
+            return response()->json(['message' => 'Post does not exist'], 400);
+        }
+        $user = auth()->user();
+        if ($post->user_id !== $user->id){
+            return response()->json(['message' => 'Post does not belong to user'], 403);
+        }
         $post->delete();
-        return JsonResponse::create($post);
+        if (Post::find($post->id) === null){
+            return response()->json(['message' => 'Post deleted successfully'], 200);
+        }
+        return response()->json(['message' => 'Post deletion failed'], 400);
     }
 
     /**
@@ -59,10 +75,21 @@ class PostsController extends Controller
      * @param Post $post
      * @return JsonResponse
      */
-    public function updatePost(Post $post): JsonResponse {
+    public function updatePost($postID): JsonResponse {
+        $post = Post::find($postID);
+        if ($post === null){
+            return response()->json(['message' => 'Post does not exist'], 400);
+        }
+        $user = auth()->user();
+        if ($post->user_id !== $user->id){
+            return response()->json(['message' => 'Post does not belong to user'], 403);
+        }
+        if (request('content') === null){
+            return response()->json(['message' => 'Content cannot be empty'], 400);
+        }
         $post->update([
             'content' => request('content')
         ]);
-        return JsonResponse::create($post);
+        return response()->json($post);
     }
 }

@@ -23,11 +23,15 @@ This project was made in hopes of getting exposed to PHP and its different frame
 
 ## Setup Intstructions
 
-#### laravel
+### laravel
 - migrations
 
-#### database
-- seeding
+### database
+Seeding
+
+Run the following command to seed the database
+
+<code>php artisan migrate:fresh --seed</code>
 
 #### react
 

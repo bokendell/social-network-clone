@@ -36,6 +36,7 @@
     window.onload = function() {
         // Build a system
         const ui = SwaggerUIBundle({
+            supportedSubmitMethods: [],
             dom_id: '#swagger-ui',
             url: "{!! $urlToDocs !!}",
             operationsSorter: {!! isset($operationsSorter) ? '"' . $operationsSorter . '"' : 'null' !!},

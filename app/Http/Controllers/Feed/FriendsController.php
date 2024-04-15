@@ -12,14 +12,14 @@ class FriendsController extends Controller
 {
     public function getUserFriends(Request $request): JsonResponse
     {
-        $friends = $request->user()->friends()->paginate(10);
+        $friends = $request->user()->friends();
 
         return response()->json($friends);
     }
 
     public function getUserFriendsById($userID): JsonResponse
     {
-        $friends = User::find($userID)->friends()->paginate(10);
+        $friends = User::find($userID)->friends();
 
         return response()->json($friends);
     }
@@ -58,7 +58,7 @@ class FriendsController extends Controller
 
     public function getFriendRequests(Request $request): JsonResponse
     {
-        $friendRequests = $request->user()->friendRequests()->paginate(10);
+        $friendRequests = $request->user()->friendRequests();
 
         return response()->json($friendRequests);
     }

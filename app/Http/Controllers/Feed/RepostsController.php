@@ -12,20 +12,20 @@ class RepostsController extends Controller
 {
     public function getUserReposts(Request $request): JsonResponse
     {
-        $reposts = Repost::where('user_id', $request->user()->id)
-            ->with('post')
-            ->latest()
-            ->paginate(10);
+        $reposts = Repost::where('user_id', $request->user()->id)->latest();
 
         return response()->json($reposts);
     }
 
     public function getPostReposts($postID): JsonResponse
     {
+        $post = Post::find($postID);
+        if ($post === null) {
+            return response()->json(['message' => 'Post does not exist'], 400);
+        }
         $reposts = Repost::where('post_id', $postID)
             ->with('user')
-            ->latest()
-            ->paginate(10);
+            ->latest();
 
         return response()->json($reposts);
     }

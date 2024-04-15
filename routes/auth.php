@@ -112,4 +112,6 @@ Route::middleware('auth')->group(function () {
     Route::post('feed/posts/{post}/videos', [VideosController::class, 'addVideo']);
     Route::delete('feed/posts/{post}/videos/{video}', [VideosController::class, 'deleteVideo']);
     Route::put('feed/posts/{post}/videos/{video}', [VideosController::class, 'updateVideo']);
+
+    Route::get('feed/posts/{post}', [PostsController::class, 'getPost']);
 });

@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\Post;
 use App\Models\Friend;
 
+// Test get posts for user
 test('get posts for user', function () {
     $response = $this->get('/feed/posts');
     $user = User::factory()->create();
@@ -29,6 +30,40 @@ test('get posts for user with no friends', function () {
     $response->assertOk();
 });
 
+test('get posts that are only posts of the user\'s friends', function () {
+    $user = User::factory()->create();
+    $friend = User::factory()->create();
+    $post = Post::factory()->create([
+        'user_id' => $friend->id,
+    ]);
+    $response = $this->actingAs($user)->get('/feed/posts');
+    $response->assertStatus(200);
+    $response->assertOk();
+    $response->assertJsonCount(0);
+});
+
+
+// Test get a post
+test('get a post', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()->create([
+        'user_id' => $user->id,
+    ]);
+    $response = $this->actingAs($user)->get('/feed/posts/' . $post->id);
+    $response->assertStatus(200);
+    $response->assertOk();
+});
+
+test('get a post that does not exist', function () {
+    $user = User::factory()->create();
+    $response = $this->actingAs($user)->get('/feed/posts/1');
+    $response->assertStatus(400);
+    $response->assertJson([
+        'message' => 'Post does not exist',
+    ]);
+});
+
+// Test create a post
 test('create a post', function () {
     $user = User::factory()->create();
     $response = $this->actingAs($user)->post('/feed/posts', [
@@ -51,6 +86,8 @@ test('create a post with no content', function () {
     ]);
 });
 
+
+// Test delete a post
 test('delete a post', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([
@@ -83,6 +120,7 @@ test('delete a post that does not belong to user', function () {
     $response->assertStatus(403);
 });
 
+// Test update a post
 test('update a post', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([

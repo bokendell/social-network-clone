@@ -68,7 +68,6 @@ class LikesController extends Controller
             return response()->json(['message' => 'Like not found'], 404);
         }
         Like::destroy($like->id);
-        logger(Like::all());
         return response()->json(['message' => 'Like removed']);
     }
 

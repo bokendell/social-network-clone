@@ -24,10 +24,23 @@ class PostsController extends Controller
         $posts = Post::whereIn('user_id', $friends)
             ->orWhere('user_id', $request->user()->id)
             ->with('user')
-            ->latest()
-            ->paginate(10);
+            ->latest();
 
         return response()->json($posts);
+    }
+
+    /**
+     * Get a post.
+     *
+     * @param Post $post
+     * @return JsonResponse
+     */
+    public function getPost($postID): JsonResponse {
+        $post = Post::find($postID);
+        if ($post === null){
+            return response()->json(['message' => 'Post does not exist'], 400);
+        }
+        return response()->json($post);
     }
 
     /**

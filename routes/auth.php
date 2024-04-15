@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Feed\PostsController;
+use App\Http\Controllers\Feed\LikesController;
+use App\Http\Controllers\Feed\CommentsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -58,8 +60,34 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('logout');
 
+    // Feed routes
+
+    // Posts
     Route::get('feed/posts', [PostsController::class, 'getPosts']);
     Route::post('feed/posts', [PostsController::class, 'createPost']);
     Route::delete('feed/posts/{post}', [PostsController::class, 'deletePost']);
     Route::put('feed/posts/{post}', [PostsController::class, 'updatePost']);
+
+    // Reposts
+
+    // Comments
+    Route::get('feed/posts/comments', [CommentsController::class, 'getUserComments']);
+    Route::get('feed/posts/{post}/comments', [CommentsController::class, 'getPostComments']);
+    Route::post('feed/posts/{post}/comments', [CommentsController::class, 'createComment']);
+    Route::delete('feed/posts/{post}/comments/{comment}', [CommentsController::class, 'deleteComment']);
+    Route::put('feed/posts/{post}/comments/{comment}', [CommentsController::class, 'updateComment']);
+
+    // Likes
+    Route::get('feed/posts/likes', [LikesController::class, 'getUserLikes']);
+    Route::get('feed/posts/{post}/likes', [LikesController::class, 'getPostLikes']);
+    Route::post('feed/posts/{post}/like', [LikesController::class, 'likePost']);
+    Route::delete('feed/posts/{post}/like', [LikesController::class, 'unlikePost']);
+
+    // Friends
+
+    // Images
+
+    // Videos
+
+
 });

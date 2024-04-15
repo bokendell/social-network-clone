@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Feed;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Like;
 use Illuminate\Http\JsonResponse;
 
 class LikesController extends Controller
@@ -20,11 +21,15 @@ class LikesController extends Controller
      * Get likes for a post.
      *
      * @param Request $request
-     * @param Post $post
      */
-    public function getPostLikes(Post $post) : JsonResponse
+    public function getPostLikes($postID) : JsonResponse
     {
-        return JsonResponse::create($post->likes);
+        $post = Post::find($postID);
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+        $likes = $post->likes;
+        return response()->json($likes);
     }
 
     /**
@@ -33,10 +38,17 @@ class LikesController extends Controller
      * @param Request $request
      * @param Post $post
      */
-    public function likePost(Request $request, Post $post) : JsonResponse
+    public function likePost($postID) : JsonResponse
     {
-        $post->likes()->attach($request->user()->id);
-        return JsonResponse::create($post->likes);
+        $post = Post::find($postID);
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+        $like = Like::create([
+            'user_id' => request()->user()->id,
+            'post_id' => $post->id
+        ]);
+        return response()->json($like);
     }
 
     /**
@@ -45,10 +57,19 @@ class LikesController extends Controller
      * @param Request $request
      * @param Post $post
      */
-    public function unlikePost(Request $request, Post $post) : JsonResponse
+    public function unlikePost($postID) : JsonResponse
     {
-        $post->likes()->detach($request->user()->id);
-        return JsonResponse::create($post->likes);
+        $post = Post::find($postID);
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+        $like = Like::where('user_id', request()->user()->id)->where('post_id', $post->id)->first();
+        if (!$like) {
+            return response()->json(['message' => 'Like not found'], 404);
+        }
+        Like::destroy($like->id);
+        logger(Like::all());
+        return response()->json(['message' => 'Like removed']);
     }
 
     /**
@@ -57,8 +78,11 @@ class LikesController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function getLikedPosts(Request $request) : JsonResponse
+    public function getUserLikes(Request $request) : JsonResponse
     {
-        return JsonResponse::create($request->user()->likes());
+        $user = $request->user();
+        $likedPostsIDs = Like::where('user_id', $user->id)->pluck('post_id');
+        $likedPosts = Post::whereIn('id', $likedPostsIDs)->get();
+        return response()->json($likedPosts);
     }
 }

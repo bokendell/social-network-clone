@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Repost;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class RepostsController extends Controller
 {
@@ -19,10 +20,18 @@ class RepostsController extends Controller
 
     public function getPostReposts($postID): JsonResponse
     {
-        $post = Post::find($postID);
-        if ($post === null) {
-            return response()->json(['message' => 'Post does not exist'], 400);
+        $data = ['post_id' => $postID,];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|exists:posts,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
+        $post = Post::find($postID);
         $reposts = Repost::where('post_id', $postID)
             ->with('user')
             ->latest();
@@ -32,17 +41,21 @@ class RepostsController extends Controller
 
     public function repost($postID): JsonResponse
     {
-        $post = Post::find($postID);
-        if ($post === null) {
-            return response()->json(['message' => 'Post does not exist'], 400);
-        }
+        $data = ['post_id' => $postID,];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|exists:posts,id',
+        ]);
 
-        $repost = Repost::where('user_id', auth()->id())
-            ->where('post_id', $postID)
-            ->first();
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $repost = Repost::find($postID);
 
         if ($repost !== null) {
-            return response()->json(['message' => 'Post already reposted'], 400);
+            return response()->json(['message' => 'Post already reposted'], 422);
         }
 
         $repost = Repost::create([
@@ -53,16 +66,25 @@ class RepostsController extends Controller
         return response()->json($repost);
     }
 
-    public function unrepost($postID): JsonResponse
+    public function unrepost($postID, $repostID): JsonResponse
     {
-        $repost = Repost::where('user_id', auth()->id())
-            ->where('post_id', $postID)
-            ->first();
+        $data = ['post_id' => $postID, 'repost_id' => $repostID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|exists:posts,id',
+            'repost_id' => 'required|exists:reposts,id'
+        ]);
 
-        if ($repost === null) {
-            return response()->json(['message' => 'Post not reposted'], 400);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
+        $repost = Repost::find($repostID);
+        if ($repost->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
         $repost->delete();
 
         return response()->json(['message' => 'Post unreposted']);

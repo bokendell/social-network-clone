@@ -29,7 +29,7 @@ class ImagesController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        $images = Post::find($postID)->images();
+        $images = Post::find($postID)->images()->latest();
 
         return response()->json($images);
     }

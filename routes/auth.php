@@ -75,8 +75,8 @@ Route::middleware('auth')->group(function () {
     // Reposts
     Route::get('feed/posts/reposts', [RepostsController::class, 'getUserReposts']);
     Route::get('feed/posts/{post}/reposts', [RepostsController::class, 'getPostReposts']);
-    Route::post('feed/posts/{post}/repost', [RepostsController::class, 'repost']);
-    Route::delete('feed/posts/{post}/repost', [RepostsController::class, 'unrepost']);
+    Route::post('feed/posts/{post}/reposts', [RepostsController::class, 'repost']);
+    Route::delete('feed/posts/{post}/reposts/{repost}', [RepostsController::class, 'unrepost']);
 
     // Comments
     Route::get('feed/posts/comments', [CommentsController::class, 'getUserComments']);
@@ -94,10 +94,12 @@ Route::middleware('auth')->group(function () {
     // Friends
     Route::get('feed/friends', [FriendsController::class, 'getUserFriends']);
     Route::get('feed/friends/{user}', [FriendsController::class, 'getUserFriendsById']);
-    Route::post('feed/friends/{user}', [FriendsController::class, 'addFriend']);
+    Route::post('feed/friends/{user}', [FriendsController::class, 'sendFriendRequest']);
     Route::delete('feed/friends/{user}', [FriendsController::class, 'removeFriend']);
-    Route::put('feed/friends/{user}', [FriendsController::class, 'updateFriend']);
+    Route::put('feed/friends/{user}', [FriendsController::class, 'updateFriendship']);
     Route::get('feed/friends/requests', [FriendsController::class, 'getFriendRequests']);
+    Route::get('feed/friends/blocked', [FriendsController::class, 'getBlockedFriends']);
+    Route::get('feed/friends/declined', [FriendsController::class, 'getDeclinedFriends']);
 
     // Images
     Route::get('feed/images', [ImagesController::class, 'getUserImages']);

@@ -207,7 +207,6 @@ test('update image', function () {
     $response = $this->actingAs($user)->put("feed/posts/{$post->id}/images/{$image->id}", [
         'image_url' => 'https://example.com/image.jpg',
     ]);
-    logger($response->getContent());
     $response->assertStatus(200);
     $response->assertJson(['image_url' => 'https://example.com/image.jpg']);
     $response->assertOk();
@@ -287,4 +286,15 @@ test('update image with string as image id', function () {
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Invalid input']);
     $response->assertJsonValidationErrors('image_id');
+});
+
+test('update image with string as image and post id', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->put("feed/posts/string/images/string", [
+        'image_url' => 'https://example.com/image.jpg',
+    ]);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id', 'image_id']);
 });

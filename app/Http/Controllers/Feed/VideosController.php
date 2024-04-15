@@ -13,7 +13,7 @@ class VideosController extends Controller
 {
     public function getUserVideos(Request $request): JsonResponse
     {
-        $videos = $request->user()->videos();
+        $videos = $request->user()->videos()->latest();
 
         return response()->json($videos);
     }
@@ -30,7 +30,7 @@ class VideosController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        $videos = Post::find($postID)->videos();
+        $videos = Post::find($postID)->videos()->latest();
 
         return response()->json($videos);
     }

@@ -3,7 +3,7 @@ use App\Models\Repost;
 use App\Models\User;
 use App\Models\Post;
 
-// Test User Reposts
+// ------------------------------ Get user reposts ------------------------------
 test('get user reposts', function () {
     $user = User::factory()->create();
     $userb = User::factory()->create();
@@ -41,7 +41,7 @@ test('get user reposts only return user resposts', function () {
     $response->assertJsonCount(0);
 });
 
-// Test Post Reposts
+// ------------------------------ Get post reposts ------------------------------
 test('get post reposts', function () {
     $user = User::factory()->create();
     $userb = User::factory()->create();
@@ -69,10 +69,11 @@ test('get reposts from non-existent post', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('feed/posts/1/reposts');
-    $response->assertStatus(400);
+    $response->assertStatus(422);
     $response->assertJson([
-        'message' => 'Post does not exist',
+        'message' => 'Invalid input',
     ]);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
 test('get reposts from post only return post\'s reposts', function () {
@@ -90,7 +91,18 @@ test('get reposts from post only return post\'s reposts', function () {
     $response->assertJsonCount(0);
 });
 
-// Test Repost
+test('get reposts from post with string as post id', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('feed/posts/abc/reposts');
+    $response->assertStatus(422);
+    $response->assertJson([
+        'message' => 'Invalid input',
+    ]);
+    $response->assertJsonValidationErrors(['post_id']);
+});
+
+// ------------------------------ Create repost ------------------------------
 test('repost post', function () {
     $user = User::factory()->create();
     $userb = User::factory()->create();
@@ -98,7 +110,7 @@ test('repost post', function () {
         ['user_id' => $userb->id]
     );
 
-    $response = $this->actingAs($user)->post('feed/posts/' . $post->id . '/repost');
+    $response = $this->actingAs($user)->post('feed/posts/' . $post->id . '/reposts');
     $response->assertStatus(200);
     $response->assertOk();
 });
@@ -106,11 +118,12 @@ test('repost post', function () {
 test('repost non-existent post', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post('feed/posts/1/repost');
-    $response->assertStatus(400);
+    $response = $this->actingAs($user)->post('feed/posts/1/reposts');
+    $response->assertStatus(422);
     $response->assertJson([
-        'message' => 'Post does not exist',
+        'message' => 'Invalid input',
     ]);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
 test('repost already reposted post', function () {
@@ -121,8 +134,8 @@ test('repost already reposted post', function () {
     );
     Repost::factory()->create(['user_id' => $user->id, 'post_id' => $post->id]);
 
-    $response = $this->actingAs($user)->post('feed/posts/' . $post->id . '/repost');
-    $response->assertStatus(400);
+    $response = $this->actingAs($user)->post('feed/posts/' . $post->id . '/reposts');
+    $response->assertStatus(422);
     $response->assertJson([
         'message' => 'Post already reposted',
     ]);
@@ -134,12 +147,23 @@ test('repost post users own post', function () {
         ['user_id' => $user->id]
     );
 
-    $response = $this->actingAs($user)->post('feed/posts/' . $post->id . '/repost');
+    $response = $this->actingAs($user)->post('feed/posts/' . $post->id . '/reposts');
     $response->assertStatus(200);
     $response->assertOk();
 });
 
-// Test Unrepost
+test('repost post with string as post id', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('feed/posts/abc/reposts');
+    $response->assertStatus(422);
+    $response->assertJson([
+        'message' => 'Invalid input',
+    ]);
+    $response->assertJsonValidationErrors(['post_id']);
+});
+
+// ------------------------------ Delete repost ------------------------------
 test('unrepost post', function() {
     $user = User::factory()->create();
     $userb = User::factory()->create();
@@ -148,7 +172,7 @@ test('unrepost post', function() {
     );
     $repost = Repost::factory()->create(['user_id' => $user->id, 'post_id' => $post->id]);
 
-    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/repost');
+    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/reposts/' . $repost->id);
     $response->assertStatus(200);
     $response->assertJson([
         'message' => 'Post unreposted',
@@ -162,11 +186,12 @@ test('unrepost non-existent repost', function() {
         ['user_id' => $userb->id]
     );
 
-    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/repost');
-    $response->assertStatus(400);
+    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/reposts/3');
+    $response->assertStatus(422);
     $response->assertJson([
-        'message' => 'Post not reposted',
+        'message' => 'Invalid input',
     ]);
+    $response->assertJsonValidationErrors(['repost_id']);
 });
 
 test('unrepost post users own post', function() {
@@ -176,7 +201,7 @@ test('unrepost post users own post', function() {
     );
     $repost = Repost::factory()->create(['user_id' => $user->id, 'post_id' => $post->id]);
 
-    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/repost');
+    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/reposts/' . $repost->id);
     $response->assertStatus(200);
     $response->assertJson([
         'message' => 'Post unreposted',
@@ -192,9 +217,54 @@ test('unrepost repost that does not belong to user', function() {
     );
     $repost = Repost::factory()->create(['user_id' => $userc->id, 'post_id' => $post->id]);
 
-    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/repost');
-    $response->assertStatus(400);
+    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/reposts/' . $repost->id);
+    $response->assertStatus(403);
     $response->assertJson([
-        'message' => 'Post not reposted',
+        'message' => 'Unauthorized',
     ]);
+});
+
+test('unrepost with string as repost id', function() {
+    $user = User::factory()->create();
+    $post = Post::factory()->create(
+        ['user_id' => $user->id]
+    );
+    $repost = Repost::factory()->create(['user_id' => $user->id, 'post_id' => $post->id]);
+
+    $response = $this->actingAs($user)->delete('feed/posts/' . $post->id . '/reposts/abc');
+    $response->assertStatus(422);
+    $response->assertJson([
+        'message' => 'Invalid input',
+    ]);
+    $response->assertJsonValidationErrors(['repost_id']);
+});
+
+test('unrepost with string as post id', function() {
+    $user = User::factory()->create();
+    $post = Post::factory()->create(
+        ['user_id' => $user->id]
+    );
+    $repost = Repost::factory()->create(['user_id' => $user->id, 'post_id' => $post->id]);
+
+    $response = $this->actingAs($user)->delete('feed/posts/abc/reposts/' . $repost->id);
+    $response->assertStatus(422);
+    $response->assertJson([
+        'message' => 'Invalid input',
+    ]);
+    $response->assertJsonValidationErrors(['post_id']);
+});
+
+test('unrepost with string as post and repost id', function() {
+    $user = User::factory()->create();
+    $post = Post::factory()->create(
+        ['user_id' => $user->id]
+    );
+    $repost = Repost::factory()->create(['user_id' => $user->id, 'post_id' => $post->id]);
+
+    $response = $this->actingAs($user)->delete('feed/posts/abc/reposts/abc');
+    $response->assertStatus(422);
+    $response->assertJson([
+        'message' => 'Invalid input',
+    ]);
+    $response->assertJsonValidationErrors(['post_id', 'repost_id']);
 });

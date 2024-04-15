@@ -3,7 +3,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Like;
 
-// Test User Likes
+// ------------------------------ Get user likes ------------------------------
 test('get user likes', function () {
     $users = User::factory()->count(5)->create();
     $user = $users->first();
@@ -54,7 +54,7 @@ test('get user likes with no posts and no likes', function () {
     $response->assertJsonCount(0);
 });
 
-// Test Post Likes
+// ------------------------------ Get post likes ------------------------------
 test('get post likes', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([
@@ -89,11 +89,22 @@ test('get post likes with no post', function () {
 
     $response = $this->actingAs($user)->get('feed/posts/1/likes');
 
-    $response->assertStatus(404);
-    $response->assertJson(['message' => 'Post not found']);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
-// Test Like Post
+test('get post likes with string as post id', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('feed/posts/abc/likes');
+
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
+});
+
+// ------------------------------ like post ------------------------------
 test('like post', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([
@@ -114,11 +125,39 @@ test('like post with no post', function () {
 
     $response = $this->actingAs($user)->post('feed/posts/1/like');
 
-    $response->assertStatus(404);
-    $response->assertJson(['message' => 'Post not found']);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
-// Test Unlike Post
+test('like post that is already liked', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()->create([
+        'user_id' => $user->id,
+    ]);
+
+    Like::factory()->create([
+        'post_id' => $post->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->actingAs($user)->post("feed/posts/{$post->id}/like");
+
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Post already liked']);
+});
+
+test('like post with string as post id', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post('feed/posts/abc/like');
+
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
+});
+
+// ------------------------------ unlike post ------------------------------
 test('unlike post', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([
@@ -144,8 +183,9 @@ test('unlike post with no post', function () {
 
     $response = $this->actingAs($user)->delete('feed/posts/1/like');
 
-    $response->assertStatus(404);
-    $response->assertJson(['message' => 'Post not found']);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
 test('unlike post with no like', function () {
@@ -156,7 +196,7 @@ test('unlike post with no like', function () {
 
     $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/like");
 
-    $response->assertStatus(404);
+    $response->assertStatus(422);
     $response->assertJson(['message' => 'Like not found']);
 });
 
@@ -174,6 +214,16 @@ test('unlike post that is not users', function () {
 
     $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/like");
 
-    $response->assertStatus(404);
+    $response->assertStatus(422);
     $response->assertJson(['message' => 'Like not found']);
+});
+
+test('unlike post with string as post id', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->delete('feed/posts/abc/like');
+
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
 });

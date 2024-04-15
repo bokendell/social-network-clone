@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Like;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class LikesController extends Controller
 {
@@ -24,11 +25,18 @@ class LikesController extends Controller
      */
     public function getPostLikes($postID) : JsonResponse
     {
-        $post = Post::find($postID);
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
+        $data = ['post_id' => $postID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|int|exists:posts,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
-        $likes = $post->likes;
+        $post = Post::find($postID);
+        $likes = Like::where('post_id', $post->id)->latest()->get();
         return response()->json($likes);
     }
 
@@ -40,9 +48,20 @@ class LikesController extends Controller
      */
     public function likePost($postID) : JsonResponse
     {
+        $data = ['post_id' => $postID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|int|exists:posts,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
+        }
         $post = Post::find($postID);
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
+        $like = Like::where('user_id', request()->user()->id)->where('post_id', $post->id)->first();
+        if ($like) {
+            return response()->json(['message' => 'Post already liked'], 422);
         }
         $like = Like::create([
             'user_id' => request()->user()->id,
@@ -59,16 +78,23 @@ class LikesController extends Controller
      */
     public function unlikePost($postID) : JsonResponse
     {
-        $post = Post::find($postID);
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
+        $data = ['post_id' => $postID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|int|exists:posts,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
+        $post = Post::find($postID);
         $like = Like::where('user_id', request()->user()->id)->where('post_id', $post->id)->first();
         if (!$like) {
-            return response()->json(['message' => 'Like not found'], 404);
+            return response()->json(['message' => 'Like not found'], 422);
         }
         Like::destroy($like->id);
-        return response()->json(['message' => 'Like removed']);
+        return response()->json(['message' => 'Like removed', 'errors']);
     }
 
     /**
@@ -81,7 +107,7 @@ class LikesController extends Controller
     {
         $user = $request->user();
         $likedPostsIDs = Like::where('user_id', $user->id)->pluck('post_id');
-        $likedPosts = Post::whereIn('id', $likedPostsIDs)->get();
+        $likedPosts = Post::whereIn('id', $likedPostsIDs)->latest()->get();
         return response()->json($likedPosts);
     }
 }

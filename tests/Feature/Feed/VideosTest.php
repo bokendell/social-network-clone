@@ -4,7 +4,7 @@ use App\Models\Video;
 use App\Models\Post;
 use App\Models\User;
 
-// ------------------------------ GetUser videos ------------------------------
+// ------------------------------ Get User videos ------------------------------
 test('get user videos', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create(['user_id' => $user->id]);
@@ -214,7 +214,7 @@ test('update video', function () {
     $response->assertJson(['video_url' => 'https://www.youtube.com/watch?v=54321']);
 });
 
-test('test update video with string as video id', function () {
+test('update video with string as video id', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create(['user_id' => $user->id]);
 
@@ -227,7 +227,7 @@ test('test update video with string as video id', function () {
     $response->assertJsonValidationErrors(['video_id']);
 });
 
-test('test update video with string as post id', function () {
+test('update video with string as post id', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->put("feed/posts/invalid/videos/1", [
@@ -237,6 +237,18 @@ test('test update video with string as post id', function () {
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Invalid input']);
     $response->assertJsonValidationErrors(['post_id']);
+});
+
+test('update video with string as post and video id', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->put("feed/posts/invalid/videos/invalid", [
+        'video_url' => 'https://www.youtube.com/watch?v=54321',
+    ]);
+
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id', 'video_id']);
 });
 
 test('update video with invalid input', function () {
@@ -250,6 +262,7 @@ test('update video with invalid input', function () {
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['video_url']);
 });
 
 test('update video with no video url', function () {

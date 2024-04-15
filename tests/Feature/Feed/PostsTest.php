@@ -4,7 +4,7 @@ use App\Models\User;
 use App\Models\Post;
 use App\Models\Friend;
 
-// Test get posts for user
+// ------------------------------ Get user posts ------------------------------
 test('get posts for user', function () {
     $response = $this->get('/feed/posts');
     $user = User::factory()->create();
@@ -43,7 +43,7 @@ test('get posts that are only posts of the user\'s friends', function () {
 });
 
 
-// Test get a post
+// ------------------------------ Get post ------------------------------
 test('get a post', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([
@@ -57,13 +57,20 @@ test('get a post', function () {
 test('get a post that does not exist', function () {
     $user = User::factory()->create();
     $response = $this->actingAs($user)->get('/feed/posts/1');
-    $response->assertStatus(400);
-    $response->assertJson([
-        'message' => 'Post does not exist',
-    ]);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
-// Test create a post
+test('get a post with a string as post id', function () {
+    $user = User::factory()->create();
+    $response = $this->actingAs($user)->get('/feed/posts/abc');
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
+});
+
+// ------------------------------ Create post ------------------------------
 test('create a post', function () {
     $user = User::factory()->create();
     $response = $this->actingAs($user)->post('/feed/posts', [
@@ -80,14 +87,13 @@ test('create a post', function () {
 test('create a post with no content', function () {
     $user = User::factory()->create();
     $response = $this->actingAs($user)->post('/feed/posts', []);
-    $response->assertStatus(400);
-    $response->assertJson([
-        'message' => 'Content cannot be empty',
-    ]);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['content']);
 });
 
 
-// Test delete a post
+// ------------------------------ Delete post------------------------------
 test('delete a post', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([
@@ -104,10 +110,17 @@ test('delete a post', function () {
 test('delete a post that does not exist', function () {
     $user = User::factory()->create();
     $response = $this->actingAs($user)->delete('/feed/posts/1');
-    $response->assertStatus(400);
-    $response->assertJson([
-        'message' => 'Post does not exist',
-    ]);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
+});
+
+test('delete a post with a string as post id', function () {
+    $user = User::factory()->create();
+    $response = $this->actingAs($user)->delete('/feed/posts/abc');
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
 test('delete a post that does not belong to user', function () {
@@ -120,7 +133,7 @@ test('delete a post that does not belong to user', function () {
     $response->assertStatus(403);
 });
 
-// Test update a post
+// ------------------------------ Update post ------------------------------
 test('update a post', function () {
     $user = User::factory()->create();
     $post = Post::factory()->create([
@@ -142,10 +155,9 @@ test('update a post that does not exist', function () {
     $response = $this->actingAs($user)->put('/feed/posts/1', [
         'content' => 'This is an updated post',
     ]);
-    $response->assertStatus(400);
-    $response->assertJson([
-        'message' => 'Post does not exist',
-    ]);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
 });
 
 test('update a post that does not belong to user', function () {
@@ -166,9 +178,17 @@ test('update a post with no content', function () {
         'user_id' => $user->id,
     ]);
     $response = $this->actingAs($user)->put('/feed/posts/' . $post->id, []);
-    $response->assertStatus(400);
-    $response->assertJson([
-        'message' => 'Content cannot be empty',
-    ]);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['content']);
 });
 
+test('update a post with a string as post id', function () {
+    $user = User::factory()->create();
+    $response = $this->actingAs($user)->put('/feed/posts/abc', [
+        'content' => 'This is an updated post',
+    ]);
+    $response->assertStatus(422);
+    $response->assertJson(['message' => 'Invalid input']);
+    $response->assertJsonValidationErrors(['post_id']);
+});

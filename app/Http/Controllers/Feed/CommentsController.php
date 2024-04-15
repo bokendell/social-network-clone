@@ -5,42 +5,54 @@ namespace App\Http\Controllers\Feed;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Post;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 
 class CommentsController extends Controller
 {
     public function getUserComments(): JsonResponse
     {
         $user = request()->user();
-        $comments = Comment::where('user_id', $user->id)->get();
+        $comments = Comment::where('user_id', $user->id)->latest()->get();
         return response()->json($comments);
     }
 
     public function getPostComments($postID): JsonResponse
     {
-        $post = Post::find($postID);
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
+        $data = ['post_id' => $postID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|int|exists:posts,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
-        $comments = Comment::where('post_id',$post->id)->get();
+        $post = Post::find($postID);
+        $comments = Comment::where('post_id',$post->id)->latest()->get();
         return response()->json($comments);
     }
 
 
-    public function createComment(): JsonResponse
+    public function createComment($postID): JsonResponse
     {
-        $post = Post::find(request()->post_id);
-        if (!$post) {
-            return response()->json(['message' => 'Post not found'], 404);
-        }
-        $content = request()->content;
-        if (!$content) {
-            return response()->json(['message' => 'Content is required'], 400);
-        }
+        $data = array_merge(request()->all(), ['post_id' => $postID]);
+        $validator = Validator::make($data, [
+            'content' => 'required|string',
+            'post_id' => 'required|int|exists:posts,id',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $post = Post::find($postID);
         $comment = Comment::create([
-            'content' => $content,
+            'content' => request()->content,
             'user_id' => request()->user()->id,
             'post_id' => $post->id
         ]);
@@ -48,36 +60,50 @@ class CommentsController extends Controller
         return response()->json($comment);
     }
 
-    public function updateComment($commentID): JsonResponse
+    public function updateComment($postID, $commentID): JsonResponse
     {
-        $content =request()->content;
-        if (!$content) {
-            return response()->json(['message' => 'Content is required'], 400);
+        $data = array_merge(request()->all(), ['post_id' => $postID, 'comment_id' => $commentID]);
+        $validator = Validator::make($data, [
+            'content' => 'required|string',
+            'post_id' => 'required|int|exists:posts,id',
+            'comment_id' => 'required|int|exists:comments,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         $comment = Comment::find($commentID);
-        if (!$comment) {
-            return response()->json(['message' => 'Comment not found'], 404);
-        }
-
         $comment->update([
-            'content' => $content
+            'content' => request()->content,
         ]);
 
         return response()->json($comment);
     }
 
-    public function deleteComment($commentID): JsonResponse
+    public function deleteComment($postID, $commentID): JsonResponse
     {
-        $comment = Comment::find($commentID);
-        if (!$comment) {
-            return response()->json(['message' => 'Comment not found'], 404);
+        $data = ['post_id' => $postID, 'comment_id' => $commentID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|int|exists:posts,id',
+            'comment_id' => 'required|int|exists:comments,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
         $commentUser = Comment::find($commentID)->user_id;
         $currentUser = request()->user()->id;
         if ($commentUser !== $currentUser) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
+        $comment = Comment::find($commentID);
 
         $comment->delete();
 

@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Feed;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\JsonResponse;
 use App\Models\Post;
-use Illuminate\Database\Eloquent\Casts\Json;
+use Illuminate\Support\Facades\Validator;
+
 
 class PostsController extends Controller
 {
@@ -24,7 +24,8 @@ class PostsController extends Controller
         $posts = Post::whereIn('user_id', $friends)
             ->orWhere('user_id', $request->user()->id)
             ->with('user')
-            ->latest();
+            ->latest()
+            ->get();
 
         return response()->json($posts);
     }
@@ -36,10 +37,18 @@ class PostsController extends Controller
      * @return JsonResponse
      */
     public function getPost($postID): JsonResponse {
-        $post = Post::find($postID);
-        if ($post === null){
-            return response()->json(['message' => 'Post does not exist'], 400);
+        $data = ['post_id' => $postID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|exists:posts,id'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
+        $post = Post::find($postID);
+
         return response()->json($post);
     }
 
@@ -50,8 +59,15 @@ class PostsController extends Controller
      * @return JsonResponse
      */
     public function createPost(): JsonResponse {
-        if (request('content') === null){
-            return response()->json(['message' => 'Content cannot be empty'], 400);
+        $validator = Validator::make(request()->all(), [
+            'content' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
         $post = Post::create([
             'user_id' => auth()->id(),
@@ -67,10 +83,17 @@ class PostsController extends Controller
      * @return JsonResponse
      */
     public function deletePost($postID): JsonResponse {
-        $post = Post::find($postID);
-        if ($post === null){
-            return response()->json(['message' => 'Post does not exist'], 400);
+        $data = ['post_id' => $postID];
+        $validator = Validator::make($data, [
+            'post_id' => 'required|exists:posts,id'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
+        $post = Post::find($postID);
         $user = auth()->user();
         if ($post->user_id !== $user->id){
             return response()->json(['message' => 'Post does not belong to user'], 403);
@@ -89,16 +112,22 @@ class PostsController extends Controller
      * @return JsonResponse
      */
     public function updatePost($postID): JsonResponse {
-        $post = Post::find($postID);
-        if ($post === null){
-            return response()->json(['message' => 'Post does not exist'], 400);
+        $data = array_merge(request()->all(), ['post_id' => $postID]);
+        $validator = Validator::make($data, [
+            'content' => 'required|string',
+            'post_id' => 'required|exists:posts,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
         }
+        $post = Post::find($postID);
         $user = auth()->user();
         if ($post->user_id !== $user->id){
             return response()->json(['message' => 'Post does not belong to user'], 403);
-        }
-        if (request('content') === null){
-            return response()->json(['message' => 'Content cannot be empty'], 400);
         }
         $post->update([
             'content' => request('content')

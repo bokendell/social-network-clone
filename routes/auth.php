@@ -93,13 +93,14 @@ Route::middleware('auth')->group(function () {
 
     // Friends
     Route::get('feed/friends', [FriendsController::class, 'getUserFriends']);
+    Route::get('feed/friends/requests', [FriendsController::class, 'getFriendRequests']);
+    Route::get('feed/friends/blocked', [FriendsController::class, 'getBlockedFriends']);
+    Route::get('feed/friends/declined', [FriendsController::class, 'getDeclinedFriends']);
+    Route::get('feed/friends/pending', [FriendsController::class, 'getPendingFriends']);
     Route::get('feed/friends/{user}', [FriendsController::class, 'getUserFriendsById']);
     Route::post('feed/friends/{user}', [FriendsController::class, 'sendFriendRequest']);
     Route::delete('feed/friends/{user}', [FriendsController::class, 'removeFriend']);
     Route::put('feed/friends/{user}', [FriendsController::class, 'updateFriendship']);
-    Route::get('feed/friends/requests', [FriendsController::class, 'getFriendRequests']);
-    Route::get('feed/friends/blocked', [FriendsController::class, 'getBlockedFriends']);
-    Route::get('feed/friends/declined', [FriendsController::class, 'getDeclinedFriends']);
 
     // Images
     Route::get('feed/images', [ImagesController::class, 'getUserImages']);

@@ -54,7 +54,7 @@ class FriendsController extends Controller
             ], 422);
         }
         // check if user id is the same as friend id
-        if ($user_id === $friend_id) {
+        if ($user_id == $friend_id) {
             return response()->json(['message' => 'You cannot send a friend request to yourself'], 422);
         }
         // check if friendship already exists
@@ -77,6 +77,8 @@ class FriendsController extends Controller
                 }
                 else {
                     $friend->update([
+                        'requester_id' => $user_id,
+                        'accepter_id' => $friend_id,
                         'status' => 'pending'
                     ]);
                     return response()->json($friend);
@@ -88,6 +90,8 @@ class FriendsController extends Controller
                 }
                 else {
                     $friend->update([
+                        'requester_id' => $user_id,
+                        'accepter_id' => $friend_id,
                         'status' => 'pending'
                     ]);
                     return response()->json($friend);
@@ -123,6 +127,12 @@ class FriendsController extends Controller
         }
 
         $friend = Friend::searchFriend($user_id, $friend_id);
+        if ($friend === null) {
+            return response()->json(['message' => 'Friendship does not exist'], 422);
+        }
+        if ($friend->status !== 'accepted') {
+            return response()->json(['message' => 'Friendship does not exist'], 422);
+        }
         $friend->delete();
 
         return response()->json(['message' => 'Friend removed']);
@@ -132,10 +142,11 @@ class FriendsController extends Controller
     {
         $friend_id = $userID;
         $user_id = request()->user()->id;
-        $data = ['user_id' => $user_id, 'friend_id' => $friend_id];
+        $data = array_merge(request()->all(), ['user_id' => $user_id, 'friend_id' => $friend_id]);
         $validator = Validator::make($data, [
             'friend_id' => 'required|exists:users,id',
-            'user_id' => 'required|exists:users,id'
+            'user_id' => 'required|exists:users,id',
+            'status' => 'required|in:accepted,declined,blocked,pending'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -144,12 +155,21 @@ class FriendsController extends Controller
             ], 422);
         }
         // check if user id is the same as friend id
-        if ($user_id === $friend_id) {
+        if ($user_id == $friend_id) {
             return response()->json(['message' => 'You cannot update friendship with self'], 422);
         }
         $friend = Friend::searchFriend($user_id, $friend_id);
         if ($friend === null) {
-            return response()->json(['message' => 'Friendship does not exist'], 400);
+            return response()->json(['message' => 'Friendship does not exist'], 422);
+        }
+        if ($friend->status === 'blocked' && $friend->requester_id === $user_id) {
+            return response()->json(['message' => 'Cannot update user is blocked by requested user'], 422);
+        }
+        if ($friend->status === 'declined' && $friend->requester_id === $user_id) {
+            return response()->json(['message' => 'Cannot update user has declined friend request'], 422);
+        }
+        if ($friend->status === 'pending' && $friend->requester_id === $user_id) {
+            return response()->json(['message' => 'Cannot update user has not accepted friend request'], 422);
         }
 
         $friend->update([
@@ -177,5 +197,12 @@ class FriendsController extends Controller
         $declinedFriends = Friend::searchFriends($request->user()->id, 'declined');
 
         return response()->json($declinedFriends);
+    }
+
+    public function getPendingFriends(Request $request): JsonResponse
+    {
+        $pendingFriends = Friend::searchFriends($request->user()->id, 'pending');
+
+        return response()->json($pendingFriends);
     }
 }

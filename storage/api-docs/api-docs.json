@@ -6,16 +6,382 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/feed/posts/{post}/likes": {
+        "feed/posts/comments": {
             "get": {
                 "tags": [
-                    "Likes"
+                    "Comments"
                 ],
-                "summary": "Get likes for a post.",
-                "operationId": "6624ed06ec262231b9450c60738c979c",
+                "summary": "Get user comments.",
+                "operationId": "9fbc627ac28108c1f3bf6cabaa83cb21",
                 "responses": {
                     "200": {
-                        "description": "Post likes",
+                        "description": "User comments",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/comments": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Get comments for a post.",
+                "operationId": "38ab0db79b553dd07cfbf022cc7d7afe",
+                "responses": {
+                    "200": {
+                        "description": "Post comments",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/comment": {
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Create a comment for a post.",
+                "operationId": "4d138afc5f6a9a0cb9ea385e7fae0b9e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "This is a comment."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/comments/{comment}": {
+            "put": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Update a comment for a post.",
+                "operationId": "5c6b08f71cff44086445bf269ad467e5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "This is an updated comment."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Delete a comment for a post.",
+                "operationId": "db824a62a14fb4fa174e83a2a8d09cf8",
+                "responses": {
+                    "200": {
+                        "description": "Comment deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "feed/friends": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get user friends",
+                "description": "Returns user friends",
+                "operationId": "getUserFriends",
+                "responses": {
+                    "200": {
+                        "description": "Got user friends",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/friends/{userID}": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get user friends by user ID",
+                "description": "Returns user friends by user ID",
+                "operationId": "getUserFriendsById",
+                "parameters": [
+                    {
+                        "name": "userID",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Got user friends",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Update friendship",
+                "description": "Update friendship",
+                "operationId": "updateFriendship",
+                "parameters": [
+                    {
+                        "name": "userID",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "accepted"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Friendship updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Send friend request",
+                "description": "Send friend request",
+                "operationId": "sendFriendRequest",
+                "parameters": [
+                    {
+                        "name": "userID",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Friend request sent",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Remove friend",
+                "description": "Remove friend",
+                "operationId": "removeFriend",
+                "parameters": [
+                    {
+                        "name": "userID",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Friend removed",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Invalid input",
                         "content": {
                             "application/json": {
                                 "schema": {}
@@ -24,12 +390,856 @@
                     }
                 }
             }
+        },
+        "feed/friends/requests": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get friend requests",
+                "description": "Get friend requests",
+                "operationId": "getFriendRequests",
+                "responses": {
+                    "200": {
+                        "description": "Got friend requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/friends/blocked": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get blocked friends",
+                "description": "Get blocked friends",
+                "operationId": "getBlockedFriends",
+                "responses": {
+                    "200": {
+                        "description": "Got blocked friends",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/friends/declined": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get declined friends",
+                "description": "Get declined friends",
+                "operationId": "getDeclinedFriends",
+                "responses": {
+                    "200": {
+                        "description": "Got declined friends",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/friends/pending": {
+            "get": {
+                "tags": [
+                    "Friends"
+                ],
+                "summary": "Get pending friends",
+                "description": "Get pending friends",
+                "operationId": "getPendingFriends",
+                "responses": {
+                    "200": {
+                        "description": "Got pending friends",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/images": {
+            "get": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Get user images.",
+                "operationId": "6964a8a48e86becab1fa0097e8a9870a",
+                "responses": {
+                    "200": {
+                        "description": "User images",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/images": {
+            "get": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Get images for a post.",
+                "operationId": "9ae6b3121d58b37a6bd0b2d8938763a5",
+                "responses": {
+                    "200": {
+                        "description": "Post images",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Add an image to a post.",
+                "operationId": "118c9c79d8debb9934c24a1188eea95e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "image_url"
+                                ],
+                                "properties": {
+                                    "image_url": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://example.com/image.jpg"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Image added",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Post does not exist"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/images/{image}": {
+            "put": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Update an image for a post.",
+                "operationId": "ebc7304f520169328625d6204dd52b58",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "image_url"
+                                ],
+                                "properties": {
+                                    "image_url": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://example.com/image.jpg"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Image updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Delete an image from a post.",
+                "operationId": "4b9aceb3ea8d4adebdc9dde9c42a77f9",
+                "responses": {
+                    "200": {
+                        "description": "Image deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Image does not exist"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/likes": {
+            "get": {
+                "tags": [
+                    "Likes"
+                ],
+                "summary": "Get likes for a post.",
+                "operationId": "a557c4ed9355284e28ac75e5abec4a5b",
+                "responses": {
+                    "200": {
+                        "description": "Post likes",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Likes"
+                ],
+                "summary": "Like a post.",
+                "operationId": "81f8c2b250bb5a5bbb63c963a7404299",
+                "responses": {
+                    "200": {
+                        "description": "Post liked",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Likes"
+                ],
+                "summary": "Unlike a post.",
+                "operationId": "5dfdcac1e170c406e2caf9e82ddcda73",
+                "responses": {
+                    "200": {
+                        "description": "Post unliked",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/likes": {
+            "get": {
+                "tags": [
+                    "Likes"
+                ],
+                "summary": "Get user likes.",
+                "operationId": "ba9e50ee95128960ff4294a538c7bd06",
+                "responses": {
+                    "200": {
+                        "description": "User likes",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get posts.",
+                "operationId": "11332c9d31a56a83b8bf5089279d3fb3",
+                "responses": {
+                    "200": {
+                        "description": "Posts",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Create a post.",
+                "operationId": "7cef8f4a5fd845dc1ad5f14d0d6974d2",
+                "responses": {
+                    "200": {
+                        "description": "Post created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get a post.",
+                "operationId": "c42a83b04824548a1c0b04db54c395c3",
+                "responses": {
+                    "200": {
+                        "description": "Post",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Update a post.",
+                "operationId": "b8439704f2430b00e3995bb393e03c69",
+                "responses": {
+                    "200": {
+                        "description": "Post updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Delete a post.",
+                "operationId": "ecbb243d045a88668c7c39945f2d43b5",
+                "responses": {
+                    "200": {
+                        "description": "Post deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/reposts": {
+            "get": {
+                "tags": [
+                    "Reposts"
+                ],
+                "summary": "Get user reposts.",
+                "operationId": "fe06335a3868c0ec9d3cc81ae4e46516",
+                "responses": {
+                    "200": {
+                        "description": "User reposts",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/reposts": {
+            "get": {
+                "tags": [
+                    "Reposts"
+                ],
+                "summary": "Get reposts for a post.",
+                "operationId": "455c3374471dc27f2436435ea6e6039f",
+                "responses": {
+                    "200": {
+                        "description": "Post reposts",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Reposts"
+                ],
+                "summary": "Repost a post.",
+                "operationId": "1297df9094324a66758d9770bedf6f74",
+                "responses": {
+                    "200": {
+                        "description": "Repost",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/reposts/{repost}": {
+            "delete": {
+                "tags": [
+                    "Reposts"
+                ],
+                "summary": "Unrepost a post.",
+                "operationId": "2e9f1f15341829fca678a6d461e45f77",
+                "responses": {
+                    "200": {
+                        "description": "Post unreposted",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/videos": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Get user videos.",
+                "operationId": "ce39be3c0c8a0076c6a892fcba352490",
+                "responses": {
+                    "200": {
+                        "description": "User videos",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/videos": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Get videos for a post.",
+                "operationId": "458d5f7440575bfadb1c7877afab5623",
+                "responses": {
+                    "200": {
+                        "description": "Post videos",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Add a video to a post.",
+                "operationId": "53bcc01ad906cb3a83049ea481128763",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "video_url"
+                                ],
+                                "properties": {
+                                    "video_url": {
+                                        "type": "string",
+                                        "example": "https://www.youtube.com/watch?v=12345"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Video added",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "feed/posts/{post}/videos/{video}": {
+            "put": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Update a video for a post.",
+                "operationId": "513a72e2722ac3e34a409f5192bb557f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "video_url"
+                                ],
+                                "properties": {
+                                    "video_url": {
+                                        "type": "string",
+                                        "example": "https://www.youtube.com/watch?v=12345"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Video updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Delete a video from a post.",
+                "operationId": "cfd975ee39b1260fd68e81f7a333eed7",
+                "responses": {
+                    "200": {
+                        "description": "Video deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid input",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
+            "name": "Comments",
+            "description": "Operations related to comments"
+        },
+        {
+            "name": "Friends",
+            "description": "Operations related to friends"
+        },
+        {
+            "name": "Images",
+            "description": "Operations related to images"
+        },
+        {
             "name": "Likes",
             "description": "Operations related to likes"
+        },
+        {
+            "name": "Posts",
+            "description": "Operations related to posts"
+        },
+        {
+            "name": "Reposts",
+            "description": "Operations related to reposts"
+        },
+        {
+            "name": "Videos",
+            "description": "Operations related to videos"
         }
     ]
 }

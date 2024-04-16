@@ -13,10 +13,18 @@ use Illuminate\Support\Facades\Validator;
 class PostsController extends Controller
 {
     /**
-     * Get user's feed.
+     * @OA\Get(
+     *      path="feed/posts",
+     *      summary="Get posts.",
+     *      tags={"Posts"},
+     *      @OA\Response(response=200, description="Posts", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
+     * Get posts.
      *
      * @param Request $request
-     * @return Response
+     * @return JsonResponse
      */
     public function getPosts(Request $request): JsonResponse
     {
@@ -31,9 +39,18 @@ class PostsController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="feed/posts/{post}",
+     *      summary="Get a post.",
+     *      tags={"Posts"},
+     *      @OA\Response(response=200, description="Post", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
      * Get a post.
      *
-     * @param Post $post
+     * @param int $postID
      * @return JsonResponse
      */
     public function getPost($postID): JsonResponse {
@@ -53,9 +70,17 @@ class PostsController extends Controller
     }
 
     /**
-     * Store a new post.
+     * @OA\Post(
+     *      path="feed/posts",
+     *      summary="Create a post.",
+     *      tags={"Posts"},
+     *      @OA\Response(response=200, description="Post created", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
      *
-     * @param Request $request
+     * Create a post.
+     *
      * @return JsonResponse
      */
     public function createPost(): JsonResponse {
@@ -77,9 +102,18 @@ class PostsController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *      path="feed/posts/{post}",
+     *      summary="Delete a post.",
+     *      tags={"Posts"},
+     *      @OA\Response(response=200, description="Post deleted", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
      * Delete a post.
      *
-     * @param Post $post
+     * @param int $postID
      * @return JsonResponse
      */
     public function deletePost($postID): JsonResponse {
@@ -106,9 +140,18 @@ class PostsController extends Controller
     }
 
     /**
+     * @OA\Put(
+     *      path="feed/posts/{post}",
+     *      summary="Update a post.",
+     *      tags={"Posts"},
+     *      @OA\Response(response=200, description="Post updated", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
      * Update a post.
      *
-     * @param Post $post
+     * @param int $postID
      * @return JsonResponse
      */
     public function updatePost($postID): JsonResponse {

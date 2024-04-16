@@ -11,6 +11,20 @@ use Illuminate\Support\Facades\Validator;
 
 class VideosController extends Controller
 {
+    /**
+     * @OA\Get(
+     *      path="feed/videos",
+     *      summary="Get user videos.",
+     *      tags={"Videos"},
+     *      @OA\Response(response=200, description="User videos", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
+     * Get user videos.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getUserVideos(Request $request): JsonResponse
     {
         $videos = $request->user()->videos()->latest();
@@ -18,6 +32,21 @@ class VideosController extends Controller
         return response()->json($videos);
     }
 
+    /**
+     * @OA\Get(
+     *      path="feed/posts/{post}/videos",
+     *      summary="Get videos for a post.",
+     *      tags={"Videos"},
+     *      @OA\Response(response=200, description="Post videos", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
+     * Get videos for a post.
+     *
+     * @param int $postID
+     * @return JsonResponse
+     */
     public function getPostVideos($postID): JsonResponse
     {
         $data = ['post_id' => $postID];
@@ -35,6 +64,28 @@ class VideosController extends Controller
         return response()->json($videos);
     }
 
+    /**
+     * @OA\Post(
+     *      path="feed/posts/{post}/videos",
+     *      summary="Add a video to a post.",
+     *      tags={"Videos"},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"video_url"},
+     *              @OA\Property(property="video_url", type="string", example="https://www.youtube.com/watch?v=12345")
+     *          )
+     *      ),
+     *      @OA\Response(response=200, description="Video added", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=403, description="Unauthorized")
+     * )
+     *
+     * Add a video to a post.
+     *
+     * @param int $postID
+     * @return JsonResponse
+     */
     public function addVideo($postID): JsonResponse
     {
         $data = array_merge(request()->all(), ['post_id' => $postID]);
@@ -62,6 +113,22 @@ class VideosController extends Controller
         return response()->json($video);
     }
 
+    /**
+     * @OA\Delete(
+     *      path="feed/posts/{post}/videos/{video}",
+     *      summary="Delete a video from a post.",
+     *      tags={"Videos"},
+     *      @OA\Response(response=200, description="Video deleted", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=403, description="Unauthorized")
+     * )
+     *
+     * Delete a video from a post.
+     *
+     * @param int $postID
+     * @param int $videoID
+     * @return JsonResponse
+     */
     public function deleteVideo($postID, $videoID): JsonResponse
     {
         $data = ['post_id' => $postID, 'video_id' => $videoID];
@@ -86,6 +153,29 @@ class VideosController extends Controller
         return response()->json(['message' => 'Video deleted']);
     }
 
+    /**
+     * @OA\Put(
+     *      path="feed/posts/{post}/videos/{video}",
+     *      summary="Update a video for a post.",
+     *      tags={"Videos"},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"video_url"},
+     *              @OA\Property(property="video_url", type="string", example="https://www.youtube.com/watch?v=12345")
+     *          )
+     *      ),
+     *      @OA\Response(response=200, description="Video updated", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=403, description="Unauthorized")
+     * )
+     *
+     * Update a video for a post.
+     *
+     * @param int $postID
+     * @param int $videoID
+     * @return JsonResponse
+     */
     public function updateVideo($postID, $videoID): JsonResponse
     {
         $data = array_merge(request()->all(), ['post_id' => $postID, 'video_id' => $videoID]);

@@ -13,15 +13,18 @@ class LikesController extends Controller
 {
     /**
      * @OA\Get(
-     *      path="/feed/posts/{post}/likes",
+     *      path="feed/posts/{post}/likes",
      *      summary="Get likes for a post.",
      *      tags={"Likes"},
-     *      @OA\Response(response=200, description="Post likes", @OA\JsonContent())
+     *      @OA\Response(response=200, description="Post likes", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
      * )
      *
      * Get likes for a post.
      *
-     * @param Request $request
+     * @param int $postID
+     * @return JsonResponse
      */
     public function getPostLikes($postID) : JsonResponse
     {
@@ -41,10 +44,19 @@ class LikesController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *      path="feed/posts/{post}/likes",
+     *      summary="Like a post.",
+     *      tags={"Likes"},
+     *      @OA\Response(response=200, description="Post liked", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
      * Like a post.
      *
-     * @param Request $request
-     * @param Post $post
+     * @param int $postID
+     * @return JsonResponse
      */
     public function likePost($postID) : JsonResponse
     {
@@ -71,10 +83,19 @@ class LikesController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *      path="feed/posts/{post}/likes",
+     *      summary="Unlike a post.",
+     *      tags={"Likes"},
+     *      @OA\Response(response=200, description="Post unliked", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     *
      * Unlike a post.
      *
-     * @param Request $request
-     * @param Post $post
+     * @param int postID
+     * @return JsonResponse
      */
     public function unlikePost($postID) : JsonResponse
     {
@@ -98,6 +119,14 @@ class LikesController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="feed/posts/likes",
+     *      summary="Get user likes.",
+     *      tags={"Likes"},
+     *      @OA\Response(response=200, description="User likes", @OA\JsonContent()),
+     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
      * Get User's liked posts.
      *
      * @param Request $request

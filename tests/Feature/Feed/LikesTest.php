@@ -111,7 +111,7 @@ test('like post', function () {
         'user_id' => $user->id,
     ]);
 
-    $response = $this->actingAs($user)->post("feed/posts/{$post->id}/like");
+    $response = $this->actingAs($user)->post("feed/posts/{$post->id}/likes");
 
     $response->assertStatus(200);
     $this->assertDatabaseHas('likes', [
@@ -123,7 +123,7 @@ test('like post', function () {
 test('like post with no post', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post('feed/posts/1/like');
+    $response = $this->actingAs($user)->post('feed/posts/1/likes');
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Invalid input']);
@@ -141,7 +141,7 @@ test('like post that is already liked', function () {
         'user_id' => $user->id,
     ]);
 
-    $response = $this->actingAs($user)->post("feed/posts/{$post->id}/like");
+    $response = $this->actingAs($user)->post("feed/posts/{$post->id}/likes");
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Post already liked']);
@@ -150,7 +150,7 @@ test('like post that is already liked', function () {
 test('like post with string as post id', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post('feed/posts/abc/like');
+    $response = $this->actingAs($user)->post('feed/posts/abc/likes');
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Invalid input']);
@@ -169,7 +169,7 @@ test('unlike post', function () {
         'user_id' => $user->id,
     ]);
 
-    $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/like");
+    $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/likes");
 
     $response->assertStatus(200);
     $this->assertDatabaseMissing('likes', [
@@ -181,7 +181,7 @@ test('unlike post', function () {
 test('unlike post with no post', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->delete('feed/posts/1/like');
+    $response = $this->actingAs($user)->delete('feed/posts/1/likes');
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Invalid input']);
@@ -194,7 +194,7 @@ test('unlike post with no like', function () {
         'user_id' => $user->id,
     ]);
 
-    $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/like");
+    $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/likes");
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Like not found']);
@@ -212,7 +212,7 @@ test('unlike post that is not users', function () {
         'user_id' => $users->last()->id,
     ]);
 
-    $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/like");
+    $response = $this->actingAs($user)->delete("feed/posts/{$post->id}/likes");
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Like not found']);
@@ -221,7 +221,7 @@ test('unlike post that is not users', function () {
 test('unlike post with string as post id', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->delete('feed/posts/abc/like');
+    $response = $this->actingAs($user)->delete('feed/posts/abc/likes');
 
     $response->assertStatus(422);
     $response->assertJson(['message' => 'Invalid input']);

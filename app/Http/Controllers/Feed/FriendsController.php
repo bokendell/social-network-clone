@@ -14,6 +14,28 @@ use function Laravel\Prompts\search;
 class FriendsController extends Controller
 {
 
+    /**
+     * @OA\Get(
+     *      path="feed/friends",
+     *      operationId="getUserFriends",
+     *      tags={"Friends"},
+     *      summary="Get user friends",
+     *      description="Returns user friends",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Got user friends",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      )
+     * )
+     *
+     * Get user friends.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getUserFriends(Request $request): JsonResponse
     {
         $friends = Friend::searchFriends($request->user()->id, 'accepted');
@@ -21,6 +43,43 @@ class FriendsController extends Controller
         return response()->json($friends);
     }
 
+
+    /**
+     * @OA\Get(
+     *      path="feed/friends/{userID}",
+     *      operationId="getUserFriendsById",
+     *      tags={"Friends"},
+     *      summary="Get user friends by user ID",
+     *      description="Returns user friends by user ID",
+     *      @OA\Parameter(
+     *          name="userID",
+     *          description="User ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Got user friends",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid input",
+     *          @OA\JsonContent()
+     *      )
+     * )
+     *
+     * Get user friends by user ID.
+     * @param int $userID
+     * @return JsonResponse
+     */
     public function getUserFriendsById($userID): JsonResponse
     {
         $data = ['user_id' => $userID];
@@ -38,6 +97,42 @@ class FriendsController extends Controller
         return response()->json($friends);
     }
 
+    /**
+     * @OA\Post(
+     *      path="feed/friends/{userID}",
+     *      operationId="sendFriendRequest",
+     *      tags={"Friends"},
+     *      summary="Send friend request",
+     *      description="Send friend request",
+     *      @OA\Parameter(
+     *          name="userID",
+     *          description="User ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Friend request sent",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid input",
+     *          @OA\JsonContent()
+     *      )
+     * )
+     *
+     * Send friend request.
+     * @param int $userID
+     * @return JsonResponse
+     */
     public function sendFriendRequest($userID): JsonResponse
     {
         $friend_id = $userID;
@@ -106,6 +201,42 @@ class FriendsController extends Controller
         return response()->json($friend);
     }
 
+    /**
+     * @OA\Delete(
+     *      path="feed/friends/{userID}",
+     *      operationId="removeFriend",
+     *      tags={"Friends"},
+     *      summary="Remove friend",
+     *      description="Remove friend",
+     *      @OA\Parameter(
+     *          name="userID",
+     *          description="User ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Friend removed",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid input",
+     *          @OA\JsonContent()
+     *      )
+     * )
+     *
+     * Remove friend.
+     * @param int $userID
+     * @return JsonResponse
+     */
     public function removeFriend($userID): JsonResponse
     {
         $friend_id = $userID;
@@ -138,6 +269,49 @@ class FriendsController extends Controller
         return response()->json(['message' => 'Friend removed']);
     }
 
+    /**
+     * @OA\Put(
+     *      path="feed/friends/{userID}",
+     *      operationId="updateFriendship",
+     *      tags={"Friends"},
+     *      summary="Update friendship",
+     *      description="Update friendship",
+     *      @OA\Parameter(
+     *          name="userID",
+     *          description="User ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"status"},
+     *              @OA\Property(property="status", type="string", example="accepted")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Friendship updated",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid input",
+     *          @OA\JsonContent()
+     *      )
+     * )
+     *
+     * Update friendship.
+     * @param int $userID
+     * @return JsonResponse
+     */
     public function updateFriendship($userID): JsonResponse
     {
         $friend_id = $userID;
@@ -179,12 +353,56 @@ class FriendsController extends Controller
         return response()->json($friend);
     }
 
+    /**
+     * @OA\Get(
+     *      path="feed/friends/requests",
+     *      operationId="getFriendRequests",
+     *      tags={"Friends"},
+     *      summary="Get friend requests",
+     *      description="Get friend requests",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Got friend requests",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      )
+     * )
+     *
+     * Get friend requests.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getFriendRequests(Request $request): JsonResponse
     {
         $friendRequests = Friend::searchFriends($request->user()->id, 'pending');
         return response()->json($friendRequests);
     }
 
+    /**
+     * @OA\Get(
+     *      path="feed/friends/blocked",
+     *      operationId="getBlockedFriends",
+     *      tags={"Friends"},
+     *      summary="Get blocked friends",
+     *      description="Get blocked friends",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Got blocked friends",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      )
+     * )
+     *
+     * Get blocked friends.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getBlockedFriends(Request $request): JsonResponse
     {
         $blockedFriends = Friend::searchFriends($request->user()->id, 'blocked');
@@ -192,6 +410,28 @@ class FriendsController extends Controller
         return response()->json($blockedFriends);
     }
 
+    /**
+     * @OA\Get(
+     *      path="feed/friends/declined",
+     *      operationId="getDeclinedFriends",
+     *      tags={"Friends"},
+     *      summary="Get declined friends",
+     *      description="Get declined friends",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Got declined friends",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      )
+     * )
+     *
+     * Get declined friends.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getDeclinedFriends(Request $request): JsonResponse
     {
         $declinedFriends = Friend::searchFriends($request->user()->id, 'declined');
@@ -199,6 +439,28 @@ class FriendsController extends Controller
         return response()->json($declinedFriends);
     }
 
+    /**
+     * @OA\Get(
+     *      path="feed/friends/pending",
+     *      operationId="getPendingFriends",
+     *      tags={"Friends"},
+     *      summary="Get pending friends",
+     *      description="Get pending friends",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Got pending friends",
+     *          @OA\JsonContent()
+     *       ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      )
+     * )
+     *
+     * Get pending friends.
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getPendingFriends(Request $request): JsonResponse
     {
         $pendingFriends = Friend::searchFriends($request->user()->id, 'pending');

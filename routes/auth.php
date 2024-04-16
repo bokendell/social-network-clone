@@ -88,8 +88,8 @@ Route::middleware('auth')->group(function () {
     // Likes
     Route::get('feed/posts/likes', [LikesController::class, 'getUserLikes']);
     Route::get('feed/posts/{post}/likes', [LikesController::class, 'getPostLikes']);
-    Route::post('feed/posts/{post}/like', [LikesController::class, 'likePost']);
-    Route::delete('feed/posts/{post}/like', [LikesController::class, 'unlikePost']);
+    Route::post('feed/posts/{post}/likes', [LikesController::class, 'likePost']);
+    Route::delete('feed/posts/{post}/likes', [LikesController::class, 'unlikePost']);
 
     // Friends
     Route::get('feed/friends', [FriendsController::class, 'getUserFriends']);

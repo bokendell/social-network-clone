@@ -61,6 +61,13 @@ This project is a simple social network clone developed to explore PHP and its v
 4. **Access Application**
    - Navigate to `/login` or `/register` to access the application. All routes are defined within `routes/auth.php`.
 
+## Testing
+- **Pest**: Test files are located in the test folder
+   - run tests:
+     ```
+     php artisan test
+     ```
+
 ## Documentation
 - **API Documentation**: Swagger docs accessible at `/api/documentation`. Note that trying out API methods directly from the documentation is disabled due to the separate authentication method required.
 

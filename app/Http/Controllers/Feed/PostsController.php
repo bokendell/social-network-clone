@@ -4,21 +4,159 @@ namespace App\Http\Controllers\Feed;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 use Inertia\Response;
 use Illuminate\Http\JsonResponse;
 use App\Models\Post;
+use App\Models\Friend;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\PostResource;
 
 
 class PostsController extends Controller
 {
     /**
      * @OA\Get(
-     *      path="feed/posts",
-     *      summary="Get posts.",
-     *      tags={"Posts"},
-     *      @OA\Response(response=200, description="Posts", @OA\JsonContent()),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *     path="/feed/posts",
+     *     summary="Get posts.",
+     *     security={{ "apiAuth": {} }},
+     *     tags={"Posts"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Posts",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="total",
+     *                     type="integer"
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="posts",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="content", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string"),
+     *                     @OA\Property(
+     *                         property="comments",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="content", type="string"),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="likes",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="images",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="url", type="string"),
+     *                             @OA\Property(property="post", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="videos",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="url", type="string"),
+     *                             @OA\Property(property="post", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="reposts",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="post", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated"
+     *             )
+     *         )
+     *     )
      * )
      *
      * Get posts.
@@ -28,26 +166,194 @@ class PostsController extends Controller
      */
     public function getPosts(Request $request): JsonResponse
     {
-        $friends = $request->user()->friends()->pluck('id');
+        $friends = Friend::searchFriends($request->user()->id, 'accepted')
+            ->map(function ($friend) use ($request) {
+                return $friend->requester_id === $request->user()->id
+                    ? $friend->accepter_id
+                    : $friend->requester_id;
+            });
         $posts = Post::whereIn('user_id', $friends)
             ->orWhere('user_id', $request->user()->id)
             ->with('user')
             ->latest()
             ->get();
 
-        return response()->json($posts);
+        return response()->json([
+            'meta' => [
+                'total' => $posts->count()
+            ],
+            'posts' => PostResource::collection($posts)
+        ]);
     }
 
     /**
      * @OA\Get(
-     *      path="feed/posts/{post}",
-     *      summary="Get a post.",
-     *      tags={"Posts"},
-     *      @OA\Response(response=200, description="Post", @OA\JsonContent()),
-     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *     path="/feed/posts/{post}",
+     *     summary="Get a post.",
+     *     security={{ "apiAuth": {} }},
+     *     tags={"Posts"},
+     *     @OA\Parameter(
+     *         name="post",
+     *         in="path",
+     *         required=true,
+     *         description="The ID of the post to retrieve",
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="id",
+     *                 type="integer"
+     *             ),
+     *             @OA\Property(
+     *                 property="content",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="user",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="username", type="string")
+     *             ),
+     *             @OA\Property(
+     *                 property="created_at",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="updated_at",
+     *                 type="string"
+     *             ),
+     *             @OA\Property(
+     *                 property="comments",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="content", type="string"),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="likes",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="url", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="videos",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="url", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="reposts",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invalid input"
+     *             ),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 additionalProperties={
+     *                     "type": "array",
+     *                     "items": {
+     *                         "type": "string"
+     *                     }
+     *                 }
+     *             )
+     *         )
+     *     ),
      * )
-     *
      * Get a post.
      *
      * @param int $postID
@@ -66,17 +372,188 @@ class PostsController extends Controller
         }
         $post = Post::find($postID);
 
-        return response()->json($post);
+
+        return response()->json(PostResource::make($post));
     }
 
     /**
      * @OA\Post(
-     *      path="feed/posts",
-     *      summary="Create a post.",
-     *      tags={"Posts"},
-     *      @OA\Response(response=200, description="Post created", @OA\JsonContent()),
-     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *     path="/feed/posts",
+     *     summary="Create a post.",
+     *     tags={"Posts"},
+     *     security={{ "apiAuth": {} }},
+     *     @OA\RequestBody(
+     *         description="Data for creating a new post",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"content"},
+     *             @OA\Property(
+     *                 property="content",
+     *                 type="string",
+     *                 description="The content of the post"
+     *             ),
+     *             @OA\Property(
+     *                 property="image_urls",
+     *                 type="array",
+     *                 description="Array of image URLs",
+     *                 @OA\Items(
+     *                     type="string",
+     *                     format="uri",
+     *                     example="http://example.com/image.jpg"
+     *                 ),
+     *             ),
+     *             @OA\Property(
+     *                 property="video_urls",
+     *                 type="array",
+     *                 description="Array of video URLs",
+     *                 @OA\Items(
+     *                     type="string",
+     *                     format="uri",
+     *                     example="http://example.com/video.mp4"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post created successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="content", type="string"),
+     *             @OA\Property(
+     *                 property="user",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="username", type="string")
+     *             ),
+     *             @OA\Property(property="created_at", type="string"),
+     *             @OA\Property(property="updated_at", type="string"),
+     *             @OA\Property(
+     *                 property="comments",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="content", type="string"),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="likes",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="url", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="videos",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="url", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="reposts",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invalid input"
+     *             ),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 additionalProperties={
+     *                     "type": "array",
+     *                     "items": {
+     *                         "type": "string"
+     *                     }
+     *                 }
+     *             )
+     *         )
+     *     ),
      * )
      *
      * Create a post.
@@ -85,7 +562,9 @@ class PostsController extends Controller
      */
     public function createPost(): JsonResponse {
         $validator = Validator::make(request()->all(), [
-            'content' => 'required|string'
+            'content' => 'required|string',
+            'image_urls' => 'nullable|string',
+            'video_urls' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -94,21 +573,118 @@ class PostsController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
+
         $post = Post::create([
             'user_id' => auth()->id(),
             'content' => request('content')
         ]);
-        return response()->json($post);
+        if (request('image_urls')){
+            $image_urls = explode(',', request('image_urls'));
+            foreach ($image_urls as $image_url){
+                $post->images()->create([
+                    'image_url' => $image_url,
+                    'user_id' => auth()->id()
+                ]);
+            }
+        }
+        if (request('video_urls')){
+            $video_urls = explode(',', request('video_urls'));
+            foreach ($video_urls as $video_url){
+                $post->videos()->create([
+                    'video_url' => $video_url,
+                    'user_id' => auth()->id()
+                ]);
+            }
+        }
+
+        return response()->json(PostResource::make($post));
     }
 
     /**
      * @OA\Delete(
-     *      path="feed/posts/{post}",
-     *      summary="Delete a post.",
-     *      tags={"Posts"},
-     *      @OA\Response(response=200, description="Post deleted", @OA\JsonContent()),
-     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *     path="/feed/posts/{postId}",
+     *     summary="Delete a post.",
+     *     tags={"Posts"},
+     *     security={{ "apiAuth": {} }},
+     *     @OA\Parameter(
+     *         name="postId",
+     *         in="path",
+     *         required=true,
+     *         description="The ID of the post to delete",
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Post deleted successfully"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Post deletion failed",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Post deletion failed"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Post does not belong to user",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Post does not belong to user"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invalid input"
+     *             ),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 additionalProperties={
+     *                     "type": "array",
+     *                     "items": {
+     *                         "type": "string"
+     *                     }
+     *                 }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated"
+     *             )
+     *         )
+     *     )
      * )
      *
      * Delete a post.
@@ -141,14 +717,196 @@ class PostsController extends Controller
 
     /**
      * @OA\Put(
-     *      path="feed/posts/{post}",
-     *      summary="Update a post.",
-     *      tags={"Posts"},
-     *      @OA\Response(response=200, description="Post updated", @OA\JsonContent()),
-     *      @OA\Response(response=422, description="Invalid input", @OA\JsonContent()),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *     path="/feed/posts/{postId}",
+     *     summary="Update a post.",
+     *     tags={"Posts"},
+     *     security={{ "apiAuth": {} }},
+     *     @OA\Parameter(
+     *         name="postId",
+     *         in="path",
+     *         required=true,
+     *         description="The ID of the post to update",
+     *         @OA\Schema(
+     *             type="integer"
+     *         )
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Payload for updating a post including content, and optionally image URLs and video URLs",
+     *         @OA\JsonContent(
+     *             required={"content"},
+     *             @OA\Property(
+     *                 property="content",
+     *                 type="string",
+     *                 description="The new content of the post"
+     *             ),
+     *             @OA\Property(
+     *                 property="image_urls",
+     *                 type="string",
+     *                 description="Comma-separated string of image URLs to be associated with the post",
+     *                 example="http://example.com/image1.jpg,http://example.com/image2.jpg"
+     *             ),
+     *             @OA\Property(
+     *                 property="video_urls",
+     *                 type="string",
+     *                 description="Comma-separated string of video URLs to be associated with the post",
+     *                 example="http://example.com/video1.mp4,http://example.com/video2.mp4"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="content", type="string"),
+     *             @OA\Property(
+     *                 property="user",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="username", type="string")
+     *             ),
+     *             @OA\Property(property="created_at", type="string"),
+     *             @OA\Property(property="updated_at", type="string"),
+     *             @OA\Property(
+     *                 property="comments",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="content", type="string"),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="likes",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="url", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="videos",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="url", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="reposts",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Post does not belong to user",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Post does not belong to user"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invalid input"
+     *             ),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 additionalProperties={
+     *                     "type": "array",
+     *                     "items": {
+     *                         "type": "string"
+     *                     }
+     *                 }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated"
+     *             )
+     *         )
+     *     )
      * )
-     *
      * Update a post.
      *
      * @param int $postID
@@ -159,6 +917,8 @@ class PostsController extends Controller
         $validator = Validator::make($data, [
             'content' => 'required|string',
             'post_id' => 'required|exists:posts,id',
+            'image_urls' => 'nullable|string',
+            'video_urls' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -175,6 +935,24 @@ class PostsController extends Controller
         $post->update([
             'content' => request('content')
         ]);
-        return response()->json($post);
+        if (request('image_urls')){
+            $image_urls = explode(',', request('image_urls'));
+            foreach ($image_urls as $image_url){
+                $post->images()->create([
+                    'image_url' => $image_url,
+                    'user_id' => auth()->id()
+                ]);
+            }
+        }
+        if (request('video_urls')){
+            $video_urls = explode(',', request('video_urls'));
+            foreach ($video_urls as $video_url){
+                $post->videos()->create([
+                    'video_url' => $video_url,
+                    'user_id' => auth()->id()
+                ]);
+            }
+        }
+        return response()->json(PostResource::make($post));
     }
 }

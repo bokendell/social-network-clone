@@ -28,16 +28,11 @@ class VideoFactory extends Factory
 
     private function getVideoURL(): string {
         $freeVideoUrls = [
-            "https://www.pexels.com/video/857195/download/?search_query=&tracking_id=",
-            "https://www.pexels.com/video/857198/download/?search_query=&tracking_id=",
-            "https://www.pexels.com/video/857219/download/?search_query=&tracking_id=",
-            "https://cdn.pixabay.com/vimeo/529179863/Footage%20Of%20People%20Walking.mp4",
-            "https://cdn.pixabay.com/vimeo/319124007/Drone%20Fly.mp4",
-            "https://coverr.co/videos/Waves%20Pier--5c0e75aaccf9f159213849",
-            "https://coverr.co/videos/downtown-la-from-day-to-night-jahvFKU2bjz",
-            "https://www.pexels.com/video/3161334/download/?search_query=&tracking_id=",
-            "https://www.pexels.com/video/4790234/download/?search_query=&tracking_id=",
-            "https://www.pexels.com/video/4474031/download/?search_query=&tracking_id="
+            "https://www.pexels.com/video/waves-rushing-to-the-shore-1321208/",
+            "https://www.pexels.com/video/drone-footage-of-an-island-s-coastline-3859430/",
+            "https://www.pexels.com/video/road-trip-4434242/",
+            "https://www.pexels.com/video/strong-sea-waves-crashing-the-rocky-shoreline-3226171/",
+            "https://www.pexels.com/video/man-on-a-pier-at-a-beautiful-river-5512609/",
         ];
         return Arr::random($freeVideoUrls);
     }

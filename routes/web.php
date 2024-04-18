@@ -10,6 +10,7 @@ use App\Http\Controllers\Feed\FriendsController;
 use App\Http\Controllers\Feed\ImagesController;
 use App\Http\Controllers\Feed\VideosController;
 use App\Http\Controllers\Feed\RepostsController;
+use App\Models\User;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -26,6 +27,20 @@ Route::get('/dashboard', function () {
     $posts = $postController->getPosts(request())->getData();
     return Inertia::render('Dashboard', ['posts' => $posts]);
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/post', function () {
+    return Inertia::render('CreatePost');
+})->middleware(['auth', 'verified'])->name('create.post');
+
+Route::get('/notifications', function () {
+    $user = User::findOrFail(auth()->id());
+    $friendsController = new FriendsController();
+    $requests = $friendsController->getFriendRequests(request())->getData();
+    return Inertia::render('Notifications', [
+        'user' => $user,
+        'requests' => $requests,
+        ]);
+})->middleware(['auth', 'verified'])->name('notifications');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

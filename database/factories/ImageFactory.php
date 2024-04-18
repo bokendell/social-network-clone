@@ -29,16 +29,13 @@ class ImageFactory extends Factory
     private function getImageURL(): string
     {
         $freeImageUrls = [
-            "https://images.unsplash.com/photo-1584697964156-9dec3f64631e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-            "https://images.unsplash.com/photo-1576158113924-477cfced1075?ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80",
-            "https://images.pexels.com/photos/207962/pexels-photo-207962.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-            "https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-            "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_960_720.jpg",
-            "https://cdn.pixabay.com/photo/2015/06/19/21/24/avenue-815297_960_720.jpg",
-            "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-            "https://images.unsplash.com/photo-1531256379419-9b831d9236f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-            "https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-            "https://cdn.pixabay.com/photo/2013/10/02/23/03/mountains-190055_960_720.jpg"
+            "https://i.pinimg.com/736x/47/75/79/4775793d1cb73fa9d7865c3548e8f3e8.jpg",
+            "https://images.axios.com/xJe9n3SSqsDzCReCk8KIvv0V8RE=/854x0:4598x3744/1920x1920/2023/08/06/1691340829056.jpg",
+            "https://yt3.googleusercontent.com/ytc/AIdro_kn8X2OzjVnxMBEci1GXWfTcmqQfGX9uHiD5DgyXAsJ9A=s900-c-k-c0x00ffffff-no-rj",
+            "https://pbs.twimg.com/profile_images/1255113654049128448/J5Yt92WW_400x400.png",
+            "https://avatars.githubusercontent.com/u/47703742?s=280&v=4",
+            "https://vitejs.dev/logo-with-shadow.png",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRstFIb9c2xX_tz60TZ7bIMiCSYJiKIEgQLnDv9OXYFlw&s",
         ];
         return Arr::random($freeImageUrls);
     }

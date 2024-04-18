@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Http\Resources\FriendResource;
+use App\Http\Controllers\Feed\PostsController;
+use App\Http\Controllers\Feed\RepostsController;
+use App\Http\Controllers\Feed\LikesController;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -71,12 +74,19 @@ class ProfileController extends Controller
         $user = User::findOrFail($userID);
         $followers = FriendResource::collection($user->followers());
         $following = FriendResource::collection($user->following());
-        $posts = $user->posts()->count();
+        $postController = new PostsController();
+        $posts = $postController->getUserPosts($userID)->getData();
+        $repostController = new RepostsController();
+        $reposts = $repostController->getUserReposts($userID)->getData();
+        $likeController = new LikesController();
+        $likes = $likeController->getUserLikes($userID)->getData();
         return Inertia::render('Profile/Show', [
             'user' => $user,
             'followers' => $followers,
             'following' => $following,
             'posts' => $posts,
+            'reposts' => $reposts,
+            'likes' => $likes,
         ]);
     }
 }

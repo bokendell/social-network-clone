@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import Post from '@/Components/Post';
 
-export default function Dashboard({ auth }) {
+export default function Dashboard({ auth, posts }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -12,7 +12,7 @@ export default function Dashboard({ auth }) {
 
             <div>
                 <div className="max-w-2xl mx-auto px-4">
-                    <Post />
+                    <Post posts={posts.posts} auth={auth} />
                 </div>
             </div>
         </AuthenticatedLayout>

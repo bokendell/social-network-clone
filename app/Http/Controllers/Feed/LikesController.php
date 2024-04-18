@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Feed;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LikeResource;
+use App\Http\Resources\PostResource;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Like;
@@ -70,16 +72,18 @@ class LikesController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        $post = Post::find($postID);
-        $like = Like::where('user_id', request()->user()->id)->where('post_id', $post->id)->first();
-        if ($like) {
+
+        $like = Like::where('user_id', auth()->id())
+            ->where('post_id', $postID);
+
+        if ($like->count() > 0) {
             return response()->json(['message' => 'Post already liked'], 422);
         }
         $like = Like::create([
-            'user_id' => request()->user()->id,
-            'post_id' => $post->id
+            'user_id' => auth()->id(),
+            'post_id' => $postID
         ]);
-        return response()->json($like);
+        return response()->json(LikeResource::make($like));
     }
 
     /**
@@ -132,11 +136,33 @@ class LikesController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function getUserLikes(Request $request) : JsonResponse
+    public function getLikes(Request $request) : JsonResponse
     {
         $user = $request->user();
         $likedPostsIDs = Like::where('user_id', $user->id)->pluck('post_id');
         $likedPosts = Post::whereIn('id', $likedPostsIDs)->latest()->get();
         return response()->json($likedPosts);
+    }
+
+    public function getUserLikes($userID) : JsonResponse
+    {
+        $data = ['user_id' => $userID];
+        $validator = Validator::make($data, [
+            'user_id' => 'required|int|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $likedPostsIDs = Like::where('user_id', $userID)->pluck('post_id');
+        $likedPosts = Post::whereIn('id', $likedPostsIDs)->latest()->get();
+        return response()->json([
+            'meta' => [
+                'total' => $likedPosts->count()
+            ],
+            'posts' => PostResource::collection($likedPosts)
+        ]);
     }
 }

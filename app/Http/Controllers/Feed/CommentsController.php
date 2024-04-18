@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Feed;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
@@ -106,7 +107,7 @@ class CommentsController extends Controller
             'post_id' => $post->id
         ]);
 
-        return response()->json($comment);
+        return response()->json(CommentResource::make($comment));
     }
 
     /**

@@ -11,11 +11,11 @@ export default function PostHeader({ post }) {
 
     return (
             <div className="flex items-center justify-between mb-2">
-                <Link href={`/profile/${post.user.id}`} className="flex items-center">
+                <Link href={`/profile/${post.user.id}`}className="flex items-center">
                     <Avatar className='mr-3' rounded />
-                <div><strong>{post.user.name}</strong></div>
+                    <div><strong>{post.user.username}</strong></div>
                 </Link>
-                <div className="ml-auto">{formatDateTime(post.updated_at)} ago</div>
+                <div className="ml-auto text-sm">{formatDateTime(post.updated_at)} ago</div>
             </div>
     );
 }

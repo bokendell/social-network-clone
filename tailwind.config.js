@@ -23,5 +23,6 @@ export default {
     plugins: [
         forms,
         flowbite.plugin(),
+        require('@headlessui/tailwindcss'),
     ],
 };

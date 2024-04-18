@@ -22,7 +22,9 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $postController = new PostsController();
+    $posts = $postController->getPosts(request())->getData();
+    return Inertia::render('Dashboard', ['posts' => $posts]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -41,7 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('feed/posts/{post}', [PostsController::class, 'updatePost'])->name('feed.posts.update');
 
     // Reposts
-    Route::get('feed/posts/reposts', [RepostsController::class, 'getUserReposts'])->name('feed.posts.reposts');
+    Route::get('feed/posts/reposts', [RepostsController::class, 'getReposts'])->name('feed.posts.reposts');
+    Route::get('/feed/posts/{user}/reposts', [RepostsController::class, 'getUserReposts'])->name('feed.posts.reposts.user');
     Route::get('feed/posts/{post}/reposts', [RepostsController::class, 'getPostReposts'])->name('feed.posts.reposts');
     Route::post('feed/posts/{post}/reposts', [RepostsController::class, 'repost'])->name('feed.posts.repost');
     Route::delete('feed/posts/{post}/reposts/{repost}', [RepostsController::class, 'unrepost'])->name('feed.posts.unrepost');
@@ -49,15 +52,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Comments
     Route::get('feed/posts/comments', [CommentsController::class, 'getUserComments'])->name('feed.posts.comments');
     Route::get('feed/posts/{post}/comments', [CommentsController::class, 'getPostComments'])->name('feed.posts.comments');
-    Route::post('feed/posts/{post}/comments', [CommentsController::class, 'createComment'])->name('feed.posts.comments.create');
-    Route::delete('feed/posts/{post}/comments/{comment}', [CommentsController::class, 'deleteComment'])->name('feed.posts.comments.delete');
+    Route::post('/feed/posts/{post}/comments', [CommentsController::class, 'createComment'])->name('feed.posts.comments.create');
+    Route::delete('/feed/posts/{post}/comments/{comment}', [CommentsController::class, 'deleteComment'])->name('feed.posts.comments.delete');
     Route::put('feed/posts/{post}/comments/{comment}', [CommentsController::class, 'updateComment'])->name('feed.posts.comments.update');
 
     // Likes
-    Route::get('feed/posts/likes', [LikesController::class, 'getUserLikes'])->name('feed.posts.likes');
+    Route::get('feed/posts/likes', [LikesController::class, 'getLikes'])->name('feed.posts.likes');
     Route::get('feed/posts/{post}/likes', [LikesController::class, 'getPostLikes'])->name('feed.posts.likes');
-    Route::post('feed/posts/{post}/likes', [LikesController::class, 'likePost'])->name('feed.posts.likes.create');
-    Route::delete('feed/posts/{post}/likes', [LikesController::class, 'unlikePost'])->name('feed.posts.likes.delete');
+    Route::post('/feed/posts/{post}/likes', [LikesController::class, 'likePost'])->name('feed.posts.likes.create');
+    Route::delete('/feed/posts/{post}/likes', [LikesController::class, 'unlikePost'])->name('feed.posts.likes.delete');
+    Route::get('/feed/posts/{user}/likes', [LikesController::class, 'getUserLikes'])->name('feed.posts.likes.user');
 
     // Friends
     Route::get('feed/friends', [FriendsController::class, 'getUserFriends'])->name('feed.friends');

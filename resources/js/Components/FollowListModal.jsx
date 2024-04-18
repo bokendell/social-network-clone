@@ -3,8 +3,7 @@ import { useState } from "react";
 import { Link } from "@inertiajs/react";
 
 export function FollowListModal({title, followList, followers, following}) {
-  const [openModal, setOpenModal] = useState(true);
-  console.log(followList);
+  const [openModal, setOpenModal] = useState(false);
 
   return (
     <>

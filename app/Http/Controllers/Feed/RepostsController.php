@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Feed;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PostResource;
+use App\Http\Resources\RepostResource;
 use Illuminate\Http\Request;
 use App\Models\Repost;
 use App\Models\Post;
@@ -25,11 +27,35 @@ class RepostsController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function getUserReposts(Request $request): JsonResponse
+    public function getReposts(Request $request): JsonResponse
     {
         $reposts = Repost::where('user_id', $request->user()->id)->latest();
 
         return response()->json($reposts);
+    }
+
+    public function getUserReposts($userID): JsonResponse
+    {
+        $data = ['user_id' => $userID,];
+        $validator = Validator::make($data, [
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $repostsIDs = Repost::where('user_id', $userID)->pluck('post_id');
+        $posts = Post::whereIn('id', $repostsIDs)->latest()->get();
+
+        return response()->json([
+            'meta' => [
+                'total' => $posts->count()
+            ],
+            'posts' => PostResource::collection($posts)
+        ]);
     }
 
     /**
@@ -97,9 +123,11 @@ class RepostsController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        $repost = Repost::find($postID);
+        
+        $repost = Repost::where('user_id', auth()->id())
+            ->where('post_id', $postID);
 
-        if ($repost !== null) {
+        if ($repost->count() > 0){
             return response()->json(['message' => 'Post already reposted'], 422);
         }
 
@@ -108,7 +136,7 @@ class RepostsController extends Controller
             'post_id' => $postID
         ]);
 
-        return response()->json($repost);
+        return response()->json(RepostResource::make($repost));
     }
 
     /**

@@ -20,6 +20,7 @@
         "vite": "^5.0"
     },
     "dependencies": {
+        "@headlessui/tailwindcss": "^0.2.0",
         "@heroicons/react": "^1.0.6",
         "@tanstack/react-query": "^5.29.2",
         "date-fns": "^3.6.0",

@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Feed;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use OpenApi\Annotations as OA;
-use Inertia\Response;
 use Illuminate\Http\JsonResponse;
 use App\Models\Post;
 use App\Models\Friend;
@@ -175,8 +173,9 @@ class PostsController extends Controller
         $posts = Post::whereIn('user_id', $friends)
             ->orWhere('user_id', $request->user()->id)
             ->with('user')
-            ->latest()
+            ->limit(10)
             ->get();
+
 
         return response()->json([
             'meta' => [

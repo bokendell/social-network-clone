@@ -31,10 +31,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Posts
-    Route::get('feed/posts', [PostsController::class, 'getPosts'])->name('feed.posts');
-    Route::post('feed/posts', [PostsController::class, 'createPost'])->name('feed.posts.create');
+    Route::get('/feed/posts', [PostsController::class, 'getPosts'])->name('feed.posts');
+    Route::post('/feed/posts', [PostsController::class, 'createPost'])->name('feed.posts.create');
     Route::delete('feed/posts/{post}', [PostsController::class, 'deletePost'])->name('feed.posts.delete');
     Route::put('feed/posts/{post}', [PostsController::class, 'updatePost'])->name('feed.posts.update');
 

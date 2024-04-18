@@ -19,6 +19,7 @@ class ImageResource extends JsonResource
             'url' => $this->image_url,
             'post' => $this->post_id,
             'user' => new UserResource($this->user),
+            'type' => 'image',
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

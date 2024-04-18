@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { ChevronUpIcon } from '@heroicons/react/solid'
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { Avatar } from 'flowbite-react';
+import { Link } from '@inertiajs/react';
 import pluralize from 'pluralize';
 
 function CommentsDisclosure({ post, isOpen}) {
@@ -18,8 +19,7 @@ function CommentsDisclosure({ post, isOpen}) {
   }, [isOpen]);
 
   const formatDateTime = (dateTime) => {
-    const dateTimeString = '2023-12-31T23:59:59Z';
-    const dateTimeObject = parseISO(dateTimeString);
+    const dateTimeObject = parseISO(dateTime);
     return formatDistanceToNow(dateTimeObject, new Date());
 }
 
@@ -44,9 +44,9 @@ function CommentsDisclosure({ post, isOpen}) {
             <Disclosure.Panel className="pt-4 pb-2text-sm text-gray-500">
               {post.comments.map((comment) => (
                 <div key={comment.id} className="flex mb-2 items-center space-x-2">
-                  <Avatar className='self-start' rounded />
+                  <Link href={`/profile/${comment.user.id}`} className='self-start'><Avatar rounded /></Link>
                   <div className="flex-1">
-                    <span className=""><strong className='mr-2'>{comment.user.username}</strong>{comment.content}</span>
+                    <span className=""><strong className='mr-2'><Link href={`/profile/${comment.user.id}`}>{comment.user.username}</Link></strong>{comment.content}</span>
                     <div>{formatDateTime(comment.updated_at)} ago</div>
                   </div>
                 </div>

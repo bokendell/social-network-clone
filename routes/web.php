@@ -29,12 +29,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Posts
     Route::get('/feed/posts', [PostsController::class, 'getPosts'])->name('feed.posts');
     Route::post('/feed/posts', [PostsController::class, 'createPost'])->name('feed.posts.create');
+    Route::get('/feed/posts/{user}', [PostsController::class, 'getUserPosts'])->name('feed.posts.user');
     Route::delete('feed/posts/{post}', [PostsController::class, 'deletePost'])->name('feed.posts.delete');
     Route::put('feed/posts/{post}', [PostsController::class, 'updatePost'])->name('feed.posts.update');
 

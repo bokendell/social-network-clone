@@ -187,6 +187,200 @@ class PostsController extends Controller
 
     /**
      * @OA\Get(
+     *     path="/feed/posts/{user}",
+     *     operationId="getUserPosts",
+     *     tags={"Posts"},
+     *     summary="Retrieve all posts for a specific user",
+     *     description="Returns a list of posts created by the specified user, identified by user ID.",
+     *     security={{ "apiAuth": {} }},
+     *     tags={"Posts"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Posts",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="total",
+     *                     type="integer"
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="posts",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="content", type="string"),
+     *                     @OA\Property(
+     *                         property="user",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="username", type="string")
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string"),
+     *                     @OA\Property(property="updated_at", type="string"),
+     *                     @OA\Property(
+     *                         property="comments",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="content", type="string"),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="likes",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="images",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="url", type="string"),
+     *                             @OA\Property(property="post", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="videos",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="url", type="string"),
+     *                             @OA\Property(property="post", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="reposts",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="post", type="integer"),
+     *                             @OA\Property(
+     *                                 property="user",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer"),
+     *                                 @OA\Property(property="name", type="string"),
+     *                                 @OA\Property(property="username", type="string")
+     *                             ),
+     *                             @OA\Property(property="created_at", type="string"),
+     *                             @OA\Property(property="updated_at", type="string")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid input",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Invalid input"
+     *             ),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 additionalProperties={
+     *                     "type": "array",
+     *                     "items": {
+     *                         "type": "string"
+     *                     }
+     *                 }
+     *             )
+     *         )
+     *     )
+     * )
+     *
+     * Retrieve all posts for a specific user.
+     *
+     * @param int $userID
+     * @return JsonResponse
+     */
+    public function getUserPosts($userID): JsonResponse {
+        $data = ['user_id' => $userID];
+        $validator = Validator::make($data, [
+            'user_id' => 'required|exists:users,id'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $posts = Post::where('user_id', $userID)->get();
+        return response()->json([
+            'meta' => [
+                'total' => $posts->count()
+            ],
+            'posts' => PostResource::collection($posts)
+        ]);
+    }
+
+    /**
+     * @OA\Get(
      *     path="/feed/posts/{post}",
      *     summary="Get a post.",
      *     security={{ "apiAuth": {} }},

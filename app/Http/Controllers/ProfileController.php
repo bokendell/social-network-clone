@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Resources\FriendResource;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -59,5 +61,22 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Display the user's profile.
+     */
+    public function show($userID): Response
+    {
+        $user = User::findOrFail($userID);
+        $followers = FriendResource::collection($user->followers());
+        $following = FriendResource::collection($user->following());
+        $posts = $user->posts()->count();
+        return Inertia::render('Profile/Show', [
+            'user' => $user,
+            'followers' => $followers,
+            'following' => $following,
+            'posts' => $posts,
+        ]);
     }
 }

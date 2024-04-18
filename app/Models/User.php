@@ -102,6 +102,16 @@ class User extends Authenticatable
         return $this->hasMany(Friend::class, 'accepter_id');
     }
 
+    public function following()
+    {
+        return $this->sentRequests()->where('status', 'accepted')->get();
+    }
+
+    public function followers()
+    {
+        return $this->receivedRequests()->where('status', 'accepted')->get();
+    }
+
     public function friends()
     {
         $sentRequests = $this->sentRequests()->where('status', 'accepted')->get();

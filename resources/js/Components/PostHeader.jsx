@@ -9,12 +9,12 @@ export default function PostHeader({ post }) {
     }
 
     return (
-        <div className="flex mb-2">
-            <Avatar rounded />
-            <div className="flex ml-2 items-center justify-beteen">
+            <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                    <Avatar className='mr-3' rounded />
                 <div><strong>{post.user.name}</strong></div>
-                <div>{formatDateTime(post.updated_at)} ago</div>
+                </div>
+                <div className="ml-auto">{formatDateTime(post.updated_at)} ago</div>
             </div>
-        </div>
-    )
+    );
 }

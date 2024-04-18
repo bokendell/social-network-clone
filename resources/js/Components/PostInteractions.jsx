@@ -1,14 +1,10 @@
 import pluralize from 'pluralize';
+import React, { useState } from 'react';
 import { Button, Accordion, Label, TextInput, Avatar } from "flowbite-react";
-import { formatDistanceToNow, parseISO } from 'date-fns';
+import CommentsDisclosure from './CommentsDisclosure';
 
 export default function PostInteractions({ post }) {
-    const formatDateTime = (dateTime) => {
-        const dateTimeString = '2023-12-31T23:59:59Z';
-        const dateTimeObject = parseISO(dateTimeString);
-        return formatDistanceToNow(dateTimeObject, new Date());
-    }
-
+    const [isOpen, setIsOpen] = useState(false);
     return (
         <>
             <div className='flex'>
@@ -33,28 +29,11 @@ export default function PostInteractions({ post }) {
                     <div className="mr-2">{post.likes.length.toLocaleString('en-US')} {pluralize("like", post.likes.length)}</div>
                     <div className="mr-2">{post.reposts.length.toLocaleString('en-US')} {pluralize("repost", post.reposts.length)}</div>
                 </div>
-                <div>{formatDateTime(post.updated_at)} ago</div>
             </div>
             <div className='flex'>
                 <div><strong>{post.user.username}</strong> {post.content}</div>
             </div>
-            <Accordion className='border-none bg-white hover:border-none focus:border-none active:border-none'>
-                <Accordion.Panel className='border-none bg-white hover:border-none focus:border-none active:border-none'>
-                    <Accordion.Title className='border-none bg-white hover:border-none focus:border-none active:border-none'>View all {post.comments.length.toLocaleString('en-US')} {pluralize("comment", post.comments.length)}</Accordion.Title>
-                        <Accordion.Content className='border-none bg-white hover:border-none focus:border-none active:border-none'>
-                            {post.comments.map(comment => (
-                                <div key={comment.id} className="flex">
-                                    <Avatar rounded />
-                                    <div className="ml-4">
-                                        <div><strong>{comment.user.username}</strong> {comment.content}</div>
-                                        <div>{formatDateTime(comment.updated_at)} ago</div>
-                                    </div>
-                                </div>
-                            ))}
-                            <TextInput id="add-comment" type="comment" placeholder="add comment" required />
-                        </Accordion.Content>
-                </Accordion.Panel>
-            </Accordion>
+            <CommentsDisclosure post={post} isOpen={isOpen} />
         </>
 
     )

@@ -6,7 +6,6 @@ import { Tab } from '@headlessui/react'
 
 export default function Notifications({ auth, requests}) {
     const tabClass = 'ui-selected:text-gray-800 ui-not-selected:text-gray-500 px-4 cursor-pointer flex justify-center items-center flex-col relative';
-
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -21,13 +20,13 @@ export default function Notifications({ auth, requests}) {
                             <div className="flex justify-center w-full bg-white relative">
                                 <Tab.List className="flex justify-center w-full">
                                     <Tab className={tabClass}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mb-2">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                         </svg>
                                         <div className="absolute bottom-0 left-0 right-0 h-1 ui-selected:bg-gray-800 ui-not-selected:bg-transparent"></div>
                                     </Tab>
                                     <Tab className={tabClass}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mb-2">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z" />
                                         </svg>
                                         <div className="absolute bottom-0 left-0 right-0 h-1 ui-selected:bg-gray-800 ui-not-selected:bg-transparent"></div>
@@ -51,7 +50,7 @@ export default function Notifications({ auth, requests}) {
                                 <Tab.Panel>
                                     <div>
                                         <div className="max-w-2xl mx-auto px-4">
-                                            {/* <Post posts={posts.posts} auth={auth}/> */}
+                                        <div>{requests.length} requests</div>
                                         </div>
                                     </div>
                                 </Tab.Panel>

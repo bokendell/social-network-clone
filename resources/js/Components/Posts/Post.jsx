@@ -1,6 +1,6 @@
-import PostHeader from '@/Components/PostHeader';
-import PostMedia from '@/Components/PostMedia';
-import PostInteractions from '@/Components/PostInteractions';
+import PostHeader from '@/Components/Posts/PostHeader';
+import PostMedia from '@/Components/Posts/PostMedia';
+import PostInteractions from '@/Components/Posts/PostInteractions';
 
 
 

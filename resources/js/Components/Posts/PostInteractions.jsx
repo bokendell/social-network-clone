@@ -3,7 +3,8 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Button } from "flowbite-react";
 import CommentsDisclosure from './CommentsDisclosure';
-import { Link } from '@inertiajs/react';
+import { UserListModal } from '../UserListModal';
+import { Link } from '../CatalystComponents/link';
 
 export default function PostInteractions({ post: initialPost, auth }) {
     const [post, setPost] = useState(initialPost);
@@ -157,8 +158,8 @@ export default function PostInteractions({ post: initialPost, auth }) {
             </div>
             <div className="flex justify-between items-center">
                 <div className="flex mr-4">
-                    <div className="mr-2">{post.likes.length.toLocaleString('en-US')} {pluralize("like", post.likes.length)}</div>
-                    <div className="mr-2">{post.reposts.length.toLocaleString('en-US')} {pluralize("repost", post.reposts.length)}</div>
+                    <UserListModal buttonTitle={`${post.likes.length.toLocaleString('en-US')} ${pluralize("like", post.likes.length)}`} title="likes" userList={post.likes} />
+                    <UserListModal buttonTitle={`${post.reposts.length.toLocaleString('en-US')} ${pluralize("repost", post.reposts.length)}`} title="reposts" userList={post.reposts} />
                 </div>
             </div>
             <div className='flex'>

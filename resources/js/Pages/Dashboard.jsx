@@ -1,7 +1,7 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import Post from '@/Components/Post';
+import Post from '@/Components/Posts/Post';
 
 export default function Dashboard({ auth, posts }) {
     return (

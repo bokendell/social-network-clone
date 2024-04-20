@@ -1,26 +1,85 @@
-import Post from "@/Components/Post";
+import { useState } from 'react';
+import Post from "@/Components/Posts/Post";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { FollowListModal } from "@/Components/FollowListModal";
-import { Avatar } from "flowbite-react";
+import { UserListModal } from "@/Components/UserListModal";
+import { Avatar } from "@/Components/CatalystComponents/avatar";
+import { Button } from "@/Components/CatalystComponents/button";
 import { Tab } from "@headlessui/react";
 import { Head } from '@inertiajs/react';
+import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/Components/CatalystComponents/dropdown';
 
 export default function Show({ auth, user, followers, following, posts, reposts, likes}) {
-
+    console.log(auth);
+    console.log(followers.data);
+    const [isFollowing, setIsFollowing] = useState(followers.data.some(entry => entry.requester.id === auth.user.id));
+    const [isUserProfile, setIsUserProfile] = useState(auth.user.id == user.id);
     const tabClass = 'ui-selected:text-gray-800 ui-not-selected:text-gray-500 px-4 cursor-pointer flex justify-center items-center flex-col relative';
+    console.log(auth, user);
+
+    const deleteUser = () => {
+        return;
+    }
+
+    const getProfileButton = () => {
+        if (isUserProfile) {
+            return (
+                <Dropdown>
+                    <DropdownButton outline>
+                        Edit Profile
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+
+                    </DropdownButton>
+                    <DropdownMenu>
+                        <DropdownItem href="#">View</DropdownItem>
+                        <DropdownItem href="#">Edit</DropdownItem>
+                        <DropdownItem onClick={() => deleteUser()}>Delete</DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
+            )
+        }
+        else if (isFollowing) {
+            return (
+                <Dropdown>
+                    <DropdownButton outline>
+                        Following
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
+
+                    </DropdownButton>
+                    <DropdownMenu>
+                        <DropdownItem href="#">Unfollow</DropdownItem>
+                        <DropdownItem href="#">Block</DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
+            )
+        }
+        else {
+            return (
+                <Button>
+                    Follow
+                </Button>
+            )
+        }
+    }
+
     return (
         <AuthenticatedLayout
             user={auth.user}
             header={
                 <div className="flex">
-                    <Avatar className='mr-3 self-start' rounded />
+                    <Avatar className='size-16 mr-3 self-start' initials={user.name.charAt(0)} src={auth.user.profile_pic_url} />
                     <div>
                         <h1 className="font-semibold text-2xl text-gray-800">{user.name}</h1>
                         <div className="text-gray-500">@{user.username}</div>
+                        <div>{user.bio}</div>
                         <div className="flex items-center">
                             <span className="mr-2">{posts.posts.length} posts</span>
-                            <span className="mr-2"><FollowListModal title={`${followers.data.length} followers`} followList={followers} followers></FollowListModal> </span>
-                            <span className="mr-2"><FollowListModal title={`${following.data.length} following`} followList={following} following></FollowListModal> </span>
+                            <span className="mr-2"><UserListModal buttonTitle={`${followers.data.length} followers`} userList={followers.data} title="followers" followers></UserListModal></span>
+                            <span className="mr-2"><UserListModal buttonTitle={`${following.data.length} following`} userList={following.data} title="following" following></UserListModal></span>
+                            {getProfileButton()}
                         </div>
                     </div>
                 </div>

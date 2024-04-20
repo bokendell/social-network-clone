@@ -2,6 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import { Avatar } from '@/Components/CatalystComponents/avatar'
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { Transition } from '@headlessui/react';
 
@@ -11,6 +12,9 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: user.name,
         email: user.email,
+        bio: user.bio,
+        username: user.username,
+        profile_pic_url: user.profile_pic_url
     });
 
     const submit = (e) => {
@@ -30,6 +34,25 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
+                <div className='flex items-end space-x-4'>
+                    <Avatar className="size-20 self-center mr-2" initials={data.name.charAt(0)} src={data.profile_pic_url}/>
+                    <div className='flex-1'>
+                        <InputLabel htmlFor="url" value="Profile Picture URL" />
+
+                        <TextInput
+                            id="url"
+                            className="mt-1 block w-full "
+                            value={data.profile_pic_url}
+                            onChange={(e) => setData('profile_pic_url', e.target.value)}
+                            required
+                            isFocused
+                            autoComplete="name"
+                        />
+                    </div>
+
+                    <InputError className="mt-2" message={errors.profile_pic_url} />
+                </div>
+
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
@@ -60,6 +83,39 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                     />
 
                     <InputError className="mt-2" message={errors.email} />
+
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="username" value="Username" />
+
+                    <TextInput
+                        id="username"
+                        className="mt-1 block w-full"
+                        value={data.username}
+                        onChange={(e) => setData('username', e.target.value)}
+                        required
+                        autoComplete="username"
+                    />
+
+                    <InputError className="mt-2" message={errors.username} />
+
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="bio" value="Bio" />
+
+                    <TextInput
+                        id="bio"
+                        className="mt-1 block w-full"
+                        value={data.bio}
+                        onChange={(e) => setData('bio', e.target.value)}
+                        required
+                        autoComplete="bio"
+                    />
+
+                    <InputError className="mt-2" message={errors.bio} />
+
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (

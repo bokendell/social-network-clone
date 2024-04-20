@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import Post from "@/Components/Posts/Post";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { UserListModal } from "@/Components/UserListModal";
@@ -8,9 +9,9 @@ import { Tab } from "@headlessui/react";
 import { Head } from '@inertiajs/react';
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/Components/CatalystComponents/dropdown';
 
-export default function Show({ auth, user, followers, following, posts, reposts, likes}) {
-    console.log(auth);
-    console.log(followers.data);
+export default function Show({ auth, user, followers: initialFollowers, following: initialFollowing, posts, reposts, likes}) {
+    const [followers, setFollowers] = useState(initialFollowers);
+    const [following, setFollowing] = useState(initialFollowing);
     const [isFollowing, setIsFollowing] = useState(followers.data.some(entry => entry.requester.id === auth.user.id));
     const [isUserProfile, setIsUserProfile] = useState(auth.user.id == user.id);
     const tabClass = 'ui-selected:text-gray-800 ui-not-selected:text-gray-500 px-4 cursor-pointer flex justify-center items-center flex-col relative';
@@ -20,23 +21,90 @@ export default function Show({ auth, user, followers, following, posts, reposts,
         return;
     }
 
+    const handleFollow = (e) => {
+        e.preventDefault();
+        try {
+            axios.post(`/feed/friends/follow/${user.id}`);
+            setIsFollowing(true);
+            setFollowers({
+                ...followers,
+                data: [...followers.data, { requester: auth.user, accepter: user }]
+            });
+        }
+        catch (error) {
+            console.error("Error following user:", error);
+            if (error.response) {
+                console.error("Error status:", error.response.status);
+                console.error("Error data:", error.response.data);
+                alert(`Error following user: ${error.response.data.message}`);
+            } else if (error.request) {
+                console.error("No response:", error.request);
+                alert("No response from server");
+            } else {
+                console.error("Error message:", error.message);
+                alert("Error sending request");
+            }
+        }
+    }
+
+    const handleUnfollow = (e) => {
+        e.preventDefault();
+        try {
+            axios.delete(`/feed/friends/${user.id}`);
+            setIsFollowing(false);
+            setFollowers({
+                ...followers,
+                data: followers.data.filter(entry => entry.requester.id !== auth.user.id)
+            });
+        }
+        catch (error) {
+            console.error("Error unfollowing user:", error);
+            if (error.response) {
+                console.error("Error status:", error.response.status);
+                console.error("Error data:", error.response.data);
+                alert(`Error unfollowing user: ${error.response.data.message}`);
+            } else if (error.request) {
+                console.error("No response:", error.request);
+                alert("No response from server");
+            } else {
+                console.error("Error message:", error.message);
+                alert("Error sending request");
+            }
+        }
+    }
+
+    const handleBlock = (e) => {
+        e.preventDefault();
+        try {
+            axios.put(`/feed/friends/${user.id}`, { status: 'blocked' });
+            setIsFollowing(false);
+            setFollowers({
+                ...followers,
+                data: followers.data.filter(entry => entry.requester.id !== auth.user.id)
+            });
+        }
+        catch (error) {
+            console.error("Error blocking user:", error);
+            if (error.response) {
+                console.error("Error status:", error.response.status);
+                console.error("Error data:", error.response.data);
+                alert(`Error blocking user: ${error.response.data.message}`);
+            } else if (error.request) {
+                console.error("No response:", error.request);
+                alert("No response from server");
+            } else {
+                console.error("Error message:", error.message);
+                alert("Error sending request");
+            }
+        }
+    }
+
+
+
     const getProfileButton = () => {
         if (isUserProfile) {
             return (
-                <Dropdown>
-                    <DropdownButton outline>
-                        Edit Profile
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                        </svg>
-
-                    </DropdownButton>
-                    <DropdownMenu>
-                        <DropdownItem href="#">View</DropdownItem>
-                        <DropdownItem href="#">Edit</DropdownItem>
-                        <DropdownItem onClick={() => deleteUser()}>Delete</DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
+                <Button href="/profile">Edit Profile</Button>
             )
         }
         else if (isFollowing) {
@@ -50,15 +118,15 @@ export default function Show({ auth, user, followers, following, posts, reposts,
 
                     </DropdownButton>
                     <DropdownMenu>
-                        <DropdownItem href="#">Unfollow</DropdownItem>
-                        <DropdownItem href="#">Block</DropdownItem>
+                        <DropdownItem onClick={handleUnfollow}>Unfollow</DropdownItem>
+                        <DropdownItem onClick={handleBlock}>Block</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             )
         }
         else {
             return (
-                <Button>
+                <Button onClick={handleFollow}>
                     Follow
                 </Button>
             )
@@ -70,7 +138,7 @@ export default function Show({ auth, user, followers, following, posts, reposts,
             user={auth.user}
             header={
                 <div className="flex">
-                    <Avatar className='size-16 mr-3 self-start' initials={user.name.charAt(0)} src={auth.user.profile_pic_url} />
+                    <Avatar className='size-50 mr-3 self-start' initials={user.name.charAt(0)} src={auth.user.profile_pic_url} />
                     <div>
                         <h1 className="font-semibold text-2xl text-gray-800">{user.name}</h1>
                         <div className="text-gray-500">@{user.username}</div>

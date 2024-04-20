@@ -86,8 +86,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('feed/friends/pending', [FriendsController::class, 'getPendingFriends'])->name('feed.friends.pending');
     Route::get('feed/friends/{user}', [FriendsController::class, 'getUserFriendsById'])->name('feed.friends.user');
     Route::post('feed/friends/{user}', [FriendsController::class, 'sendFriendRequest'])->name('feed.friends.create');
-    Route::delete('feed/friends/{user}', [FriendsController::class, 'removeFriend'])->name('feed.friends.delete');
-    Route::put('feed/friends/{user}', [FriendsController::class, 'updateFriendship'])->name('feed.friends.update');
+    Route::post('/feed/friends/follow/{user}', [FriendsController::class, 'followUser'])->name('feed.friends.follow');
+    Route::delete('/feed/friends/{user}', [FriendsController::class, 'removeFriend'])->name('feed.friends.delete');
+    Route::put('/feed/friends/{user}', [FriendsController::class, 'updateFriendship'])->name('feed.friends.update');
 
     // Images
     Route::get('feed/images', [ImagesController::class, 'getUserImages'])->name('feed.images');

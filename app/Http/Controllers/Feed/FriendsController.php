@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Feed;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\FriendResource;
 use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -201,6 +202,74 @@ class FriendsController extends Controller
         return response()->json($friend);
     }
 
+    public function followUser($userID): JsonResponse
+    {
+        $friend_id = $userID;
+        $user_id = request()->user()->id;
+        $data = ['user_id' => $user_id, 'friend_id' => $friend_id];
+        $validator = Validator::make($data, [
+            'friend_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid input',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        // check if user id is the same as friend id
+        if ($user_id == $friend_id) {
+            return response()->json(['message' => 'You cannot send a friend request to yourself'], 422);
+        }
+        // check if friendship already exists
+        $friend = Friend::searchFriend($user_id, $friend_id);
+        if ($friend !== null) {
+            if ($friend->status === 'accepted') {
+                return response()->json(['message' => 'User is already a friend'], 422);
+            }
+            else if ($friend->status === 'pending') {
+                if ($friend->requester_id === $user_id) {
+                    return response()->json(['message' => 'Friend request already sent'], 422);
+                }
+                else {
+                    return response()->json(['message' => 'Already received friend request from requested user'], 422);
+                }
+            }
+            else if ($friend->status === 'blocked') {
+                if ($friend->requester_id === $user_id) {
+                    return response()->json(['message' => 'Requested user has blocked you'], 422);
+                }
+                else {
+                    $friend->update([
+                        'requester_id' => $user_id,
+                        'accepter_id' => $friend_id,
+                        'status' => 'accepted'
+                    ]);
+                    return response()->json($friend);
+                }
+            }
+            else if ($friend->status === 'declined') {
+                if ($friend->requester_id === $user_id) {
+                    return response()->json(['message' => 'Friend request already declined'], 422);
+                }
+                else {
+                    $friend->update([
+                        'requester_id' => $user_id,
+                        'accepter_id' => $friend_id,
+                        'status' => 'accepted'
+                    ]);
+                    return response()->json($friend);
+                }
+            }
+        }
+        $friend = Friend::create([
+            'requester_id' => $user_id,
+            'accepter_id' => $friend_id,
+            'status' => 'accepted'
+        ]);
+        return response()->json(FriendResource::make($friend));
+    }
+
     /**
      * @OA\Delete(
      *      path="feed/friends/{userID}",
@@ -347,6 +416,8 @@ class FriendsController extends Controller
         }
 
         $friend->update([
+            'requester_id' => $friend_id,
+            'accepter_id' => $user_id,
             'status' => request()->input('status')
         ]);
 

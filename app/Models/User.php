@@ -22,6 +22,8 @@ class User extends Authenticatable
         'dob',
         'username',
         'email',
+        'profile_pic_url',
+        'bio',
         'status',
         'password',
 
@@ -48,7 +50,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'dob' => 'date',
-            'status' => 'string'
+            'status' => 'string',
         ];
     }
 

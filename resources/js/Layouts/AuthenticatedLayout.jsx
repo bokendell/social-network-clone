@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar } from 'flowbite-react';
+import { Avatar } from '@/Components/CatalystComponents/avatar';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
@@ -39,7 +39,7 @@ export default function Authenticated({ user, header, children }) {
                                     </svg>
                                 </NavLink>
                                 <NavLink href={`/profile/${user.id}`} active={currPathName === `/profile/${user.id}`}>
-                                    <Avatar size="sm" rounded/>
+                                    <Avatar initials={user.name.charAt(0)} src={user.profile_pic_url} className="size-8"/>
                                 </NavLink>
                             </div>
                         </div>

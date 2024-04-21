@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/react';
 import Post from '@/Components/Posts/Post';
 
 export default function Dashboard({ auth, posts }) {
+    (posts.posts);
     return (
         <AuthenticatedLayout
             user={auth.user}

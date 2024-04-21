@@ -1,4 +1,5 @@
 import { Link, Head } from '@inertiajs/react';
+import { Text } from '@/Components/CatalystComponents/text';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {
@@ -110,12 +111,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     Documentation
                                                 </h2>
 
-                                                <p className="mt-4 text-sm/relaxed">
+                                                <Text className="mt-4 text-sm/relaxed">
                                                     Laravel has wonderful documentation covering every aspect of the
                                                     framework. Whether you are a newcomer or have prior experience with
                                                     Laravel, we recommend reading our documentation from beginning to
                                                     end.
-                                                </p>
+                                                </Text>
                                             </div>
                                         </div>
 
@@ -155,11 +156,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <div className="pt-3 sm:pt-5">
                                         <h2 className="text-xl font-semibold text-black dark:text-white">Laracasts</h2>
 
-                                        <p className="mt-4 text-sm/relaxed">
+                                        <Text className="mt-4 text-sm/relaxed">
                                             Laracasts offers thousands of video tutorials on Laravel, PHP, and
                                             JavaScript development. Check them out, see for yourself, and massively
                                             level up your development skills in the process.
-                                        </p>
+                                        </Text>
                                     </div>
 
                                     <svg
@@ -201,11 +202,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             Laravel News
                                         </h2>
 
-                                        <p className="mt-4 text-sm/relaxed">
+                                        <Text className="mt-4 text-sm/relaxed">
                                             Laravel News is a community driven portal and newsletter aggregating all of
                                             the latest and most important news in the Laravel ecosystem, including new
                                             package releases and tutorials.
-                                        </p>
+                                        </Text>
                                     </div>
 
                                     <svg
@@ -242,7 +243,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             Vibrant Ecosystem
                                         </h2>
 
-                                        <p className="mt-4 text-sm/relaxed">
+                                        <Text className="mt-4 text-sm/relaxed">
                                             Laravel's robust library of first-party tools and libraries, such as{' '}
                                             <a
                                                 href="https://forge.laravel.com"
@@ -322,7 +323,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 Telescope
                                             </a>
                                             , and more.
-                                        </p>
+                                        </Text>
                                     </div>
                                 </div>
                             </div>

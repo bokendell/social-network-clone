@@ -7,6 +7,8 @@ use App\Http\Resources\FriendResource;
 use App\Http\Controllers\Feed\PostsController;
 use App\Http\Controllers\Feed\RepostsController;
 use App\Http\Controllers\Feed\LikesController;
+use App\Http\Resources\UserResource;
+use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -72,6 +74,10 @@ class ProfileController extends Controller
     public function show($userID): Response
     {
         $user = User::findOrFail($userID);
+        if (Friend::isBlocked(Auth::id(), $userID))
+            return Inertia::render('Profile/Blocked', [
+                'user' => $user,
+            ]);
         $followers = FriendResource::collection($user->followers());
         $following = FriendResource::collection($user->following());
         $postController = new PostsController();
@@ -80,6 +86,7 @@ class ProfileController extends Controller
         $reposts = $repostController->getUserReposts($userID)->getData();
         $likeController = new LikesController();
         $likes = $likeController->getUserLikes($userID)->getData();
+        $relatedFriends = UserResource::collection(Friend::getRelatedFriends(Auth::id(), $userID));
         return Inertia::render('Profile/Show', [
             'user' => $user,
             'followers' => $followers,
@@ -87,6 +94,7 @@ class ProfileController extends Controller
             'posts' => $posts,
             'reposts' => $reposts,
             'likes' => $likes,
+            'relatedFriends' => $relatedFriends,
         ]);
     }
 }

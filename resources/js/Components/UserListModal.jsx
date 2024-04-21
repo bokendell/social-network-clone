@@ -20,7 +20,6 @@ export function UserListModal({buttonTitle= '', title = '', userList: initialUse
     else {
       return null;
     }
-   
   }
 
   const userListDisplay = () => {
@@ -29,7 +28,7 @@ export function UserListModal({buttonTitle= '', title = '', userList: initialUse
       return (
         <li key={user.id}>
           <Link href={`/profile/${user.id}`} className="flex items-center">
-            <Avatar initials={user.name.charAt(0)} src={user.profile_pic_url }className="mr-3 size-8" rounded/>
+            <Avatar initials={user.name.charAt(0)} src={user.profile_pic_url }className="mr-3 size-8"/>
             <div>
               <strong>{user.name}</strong>
               <div className="text-gray-500">@{user.username}</div>
@@ -43,11 +42,11 @@ export function UserListModal({buttonTitle= '', title = '', userList: initialUse
   const handleUserSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
-    
+
     const filteredUsers = initialUserList
       .filter(item => {
         const user = getUserFromItem(item);
-       
+
         if (user && user.name && user.username) {
           return user.name.toLowerCase().includes(value) || user.username.toLowerCase().includes(value);
         }
@@ -59,12 +58,12 @@ export function UserListModal({buttonTitle= '', title = '', userList: initialUse
         return nameA.localeCompare(nameB);
       })
       .slice(0, 30);
-  
+
     setUsersFound(filteredUsers.length > 0);
     setUserList(filteredUsers);
   }
-  
-  
+
+
 
   return (
     <>
@@ -83,9 +82,9 @@ export function UserListModal({buttonTitle= '', title = '', userList: initialUse
             </Label>
           </Field>
           <ul className="h-60 overflow-y-auto">
-            {usersFound ? 
+            {usersFound ?
               userListDisplay()
-              : 
+              :
               <li>No users found</li>
             }
           </ul>
@@ -93,5 +92,5 @@ export function UserListModal({buttonTitle= '', title = '', userList: initialUse
       </Dialog>
     </>
   );
-  
+
 }

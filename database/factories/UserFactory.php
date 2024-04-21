@@ -32,7 +32,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'status' => $this->status(),
             'dob' => fake()->date(),
-            'bio' => fake()->paragraph(),
+            'bio' => substr(fake()->paragraph(), 0, 255),
             'profile_pic_url' => $this->getProfileURL(),
             'username' => fake()->unique()->userName(),
             'password' => static::$password ??= Hash::make('password'),

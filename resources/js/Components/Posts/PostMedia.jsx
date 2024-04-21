@@ -1,7 +1,8 @@
 import React from 'react';
 import { Carousel } from 'flowbite-react';
 
-export default function PostMedia({ post }) {
+export default function PostMedia({ post}) {
+    // console.log('PostMedia', post);
 
     const media = [...post.images, ...post.videos];
 

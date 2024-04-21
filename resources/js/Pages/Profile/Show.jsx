@@ -9,14 +9,14 @@ import { Tab } from "@headlessui/react";
 import { Head } from '@inertiajs/react';
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/Components/CatalystComponents/dropdown';
 
-export default function Show({ auth, user, followers: initialFollowers, following: initialFollowing, posts, reposts, likes}) {
+export default function Show({ auth, user, followers: initialFollowers, following: initialFollowing, posts, reposts, likes, relatedFriends}) {
     const [followers, setFollowers] = useState(initialFollowers);
     const [following, setFollowing] = useState(initialFollowing);
     const [isFollowing, setIsFollowing] = useState(followers.data.some(entry => entry.requester.id === auth.user.id));
     const [isUserProfile, setIsUserProfile] = useState(auth.user.id == user.id);
     const tabClass = 'ui-selected:text-gray-800 ui-not-selected:text-gray-500 px-4 cursor-pointer flex justify-center items-center flex-col relative';
-    console.log(auth, user);
 
+    ("relatedFriends", relatedFriends.data);
     const deleteUser = () => {
         return;
     }
@@ -99,7 +99,23 @@ export default function Show({ auth, user, followers: initialFollowers, followin
         }
     }
 
-
+    const getFollowedBy = () => {
+        // if followed by more than 3
+        if (relatedFriends.data.length > 3) {
+            return `Followed by ${relatedFriends.data[0].requester.name}, ${relatedFriends.data[1].requester.name}, ${relatedFriends.data[2].requester.name}, and ${relatedFriends.data.length - 3} others`;
+        // if followed by 3
+        } else if (relatedFriends.data.length === 3) {
+            return `Followed by ${relatedFriends.data[0].requester.name}, ${relatedFriends.data[1].requester.name}, and ${relatedFriends.data[2].requester.name}`;
+        // if followed by 2
+        } else if (relatedFriends.data.length === 2) {
+            return `Followed by ${relatedFriends.data[0].requester.name} and ${relatedFriends.data[1].requester.name}`;
+        // if followed by 1
+        } else if (relatedFriends.data.length === 1) {
+            return `Followed by ${relatedFriends.data[0].requester.name}`;
+        }
+        // if followed by 0
+        return '';
+    }
 
     const getProfileButton = () => {
         if (isUserProfile) {
@@ -149,6 +165,11 @@ export default function Show({ auth, user, followers: initialFollowers, followin
                             <span className="mr-2"><UserListModal buttonTitle={`${following.data.length} following`} userList={following.data} title="following" following></UserListModal></span>
                             {getProfileButton()}
                         </div>
+                        {/* {relatedFriends && relatedFriends.data.length > 0 &&
+                            <div className="flex items-center">
+                                <UserListModal buttonTitle={getFollowedBy()} userList={relatedFriends.data} title="followed by" followers></UserListModal>
+                            </div>
+                        } */}
                     </div>
                 </div>
 

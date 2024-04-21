@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('profile_pic_url')->after('username');
-            $table->string('bio')->after('profile_pic_url');
+            $table->string('profile_pic_url')->after('username')->default('');
+            $table->string('bio')->after('profile_pic_url')->default('');
         });
     }
 

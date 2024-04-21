@@ -6,6 +6,10 @@ import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { useForm } from '@inertiajs/react';
+import { Button } from '@/Components/CatalystComponents/button';
+import { Strong, Text } from '@/Components/CatalystComponents/text';
+import { Field, FieldGroup, Fieldset, Label, ErrorMessage} from '@/Components/CatalystComponents/fieldset';
+import { Input } from '@/Components/CatalystComponents/input';
 
 export default function DeleteUserForm({ className = '' }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
@@ -46,52 +50,56 @@ export default function DeleteUserForm({ className = '' }) {
     return (
         <section className={`space-y-6 ${className}`}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Delete Account</h2>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100"><Strong>Delete Account</Strong></h2>
 
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Once your account is deleted, all of its resources and data will be permanently deleted. Before
                     deleting your account, please download any data or information that you wish to retain.
-                </p>
+                </Text>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>Delete Account</DangerButton>
+            <Button color="red" onClick={confirmUserDeletion}>Delete Account</Button>
 
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
                 <form onSubmit={deleteUser} className="p-6">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                        Are you sure you want to delete your account?
+                        <Strong>Are you sure you want to delete your account?</Strong>
                     </h2>
 
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    <Text className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         Once your account is deleted, all of its resources and data will be permanently deleted. Please
                         enter your password to confirm you would like to permanently delete your account.
-                    </p>
+                    </Text>
+                    <Fieldset>
+                        <FieldGroup>
+                            <Field>
+                                <Label className="sr-only" htmlFor="password">Password</Label>
 
-                    <div className="mt-6">
-                        <InputLabel htmlFor="password" value="Password" className="sr-only" />
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    ref={passwordInput}
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    className="mt-1 block w-3/4"
+                                    placeholder="Password"
+                                />
 
-                        <TextInput
-                            id="password"
-                            type="password"
-                            name="password"
-                            ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            className="mt-1 block w-3/4"
-                            isFocused
-                            placeholder="Password"
-                        />
+                                {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+                            </Field>
+                            <Field className="mt-6 flex justify-end">
+                                <Button color="zinc" onClick={closeModal}>Cancel</Button>
 
-                        <InputError message={errors.password} className="mt-2" />
-                    </div>
+                                <Button color="red" className="ms-3" disabled={processing}>
+                                    Delete Account
+                                </Button>
+                            </Field>
 
-                    <div className="mt-6 flex justify-end">
-                        <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
+                        </FieldGroup>
+                    </Fieldset>
 
-                        <DangerButton className="ms-3" disabled={processing}>
-                            Delete Account
-                        </DangerButton>
-                    </div>
+
                 </form>
             </Modal>
         </section>

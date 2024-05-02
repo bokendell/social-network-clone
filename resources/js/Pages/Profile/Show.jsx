@@ -16,7 +16,7 @@ export default function Show({ auth, user, followers: initialFollowers, followin
     const [isUserProfile, setIsUserProfile] = useState(auth.user.id == user.id);
     const tabClass = 'ui-selected:text-gray-800 ui-not-selected:text-gray-500 px-4 cursor-pointer flex justify-center items-center flex-col relative';
 
-    ("relatedFriends", relatedFriends.data);
+    
     const deleteUser = () => {
         return;
     }

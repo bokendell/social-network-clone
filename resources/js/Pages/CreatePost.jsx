@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PostMediaDragDrop from '@/Components/Posts/PostMediaDragDrop';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/Components/CatalystComponents/button';
 import { Textarea } from '@/Components/CatalystComponents/textarea';
@@ -7,10 +8,13 @@ import { Strong, Text } from '@/Components/CatalystComponents/text';
 import { Input } from '@/Components/CatalystComponents/input';
 import { Field, FieldGroup, Fieldset, Label, Legend, ErrorMessage } from '@/Components/CatalystComponents/fieldset';
 import Post from '@/Components/Posts/Post';
+import { set } from 'date-fns';
 
 export default function CreatePost({ auth }) {
     const [imageInput, setImageInput] = useState('');
     const [videoInput, setVideoInput] = useState('');
+    const [postSuccess, setPostSuccess] = useState(false);
+    const [media, setMedia] = useState([]);
     const { data, setData, post, processing, errors, reset } = useForm({
         content: '',
         image_urls: [],
@@ -19,18 +23,66 @@ export default function CreatePost({ auth }) {
 
     const submit = (e) => {
         e.preventDefault();
+        setData('image_urls', media.filter((mediaItem) => mediaItem.type === 'image').map((mediaItem) => mediaItem.url));
+        setData('video_urls', media.filter((mediaItem) => mediaItem.type === 'video').map((mediaItem) => mediaItem.url));
+        post(route('feed.posts.create'), {
+            onSuccess: () => {
+                setPostSuccess(true);
+                reset();
+                setImageInput('');
+                setVideoInput('');
+            },
+        });
     };
+
+    const handleMediaUpdate = (newMedia) => {
+        // console.log(media);
+        // console.log(newMedia);
+        setMedia(newMedia);
+    };
+
+    const createMediaArray = (mediaURLs, type) => {
+        const now = new Date();
+        return mediaURLs.map((mediaURL, index) => {
+            return {
+                id: index,
+                url: mediaURL,
+                type: type,
+                created_at: now.toISOString(),
+                updated_at: now.toISOString(),
+                post: 1,
+                user: auth.user,
+            };
+        });
+    };
+
+    const posts = useMemo(() => {
+        const now = new Date().toISOString();
+        return [{
+            id: 1,
+            content: data.content,
+            created_at: now,
+            updated_at: now,
+            comments: [],
+            likes: [],
+            reposts: [],
+            images: createMediaArray(media.filter((mediaItem) => mediaItem.type === 'image').map((mediaItem) => mediaItem.url), 'image'),
+            videos: createMediaArray(media.filter((mediaItem) => mediaItem.type === 'video').map((mediaItem) => mediaItem.url), 'video'),
+            user: auth.user,
+        }];
+    }, [media]);
 
     const addImageUrl = () => {
         if (validateUrl(imageInput)) {
-            setData('image_urls', [...data.image_urls, imageInput]);
+            setMedia([...media, { id: media.length, url: imageInput, type: 'image' }]);
             setImageInput('');
         }
     };
 
+
     const addVideoUrl = () => {
         if (validateUrl(videoInput)) {
-            setData('video_urls', [...data.video_urls, videoInput]);
+            setMedia([...media, { id: media.length, url: videoInput, type: 'video' }]);
             setVideoInput('');
         }
     };
@@ -50,38 +102,6 @@ export default function CreatePost({ auth }) {
         return urlPattern.test(url) || base64Pattern.test(url);
     };
 
-
-    const createPostsObject = () => {
-        const now = new Date();
-        return [{
-            id: 1,
-            content: data.content,
-            created_at: now.toISOString(),
-            updated_at: now.toISOString(),
-            comments: [],
-            likes: [],
-            reposts: [],
-            images: createMediaArray(data.image_urls, 'image'),
-            videos: createMediaArray(data.video_urls, 'video'),
-            user: auth.user,
-        }];
-    };
-
-    const createMediaArray = (mediaURLs, type) => {
-        const now = new Date();
-        return mediaURLs.map((mediaURL, index) => {
-            return {
-                id: index,
-                url: mediaURL,
-                type: type,
-                created_at: now.toISOString(),
-                updated_at: now.toISOString(),
-                post: 1,
-                user: auth.user,
-            };
-        });
-    };
-
     const isInvalid = (url) => {
         if (url.length === 0) {
             return false;
@@ -91,7 +111,6 @@ export default function CreatePost({ auth }) {
         }
         return true;
     };
-
 
     const handleContentChange = (e) => setData('content', e.target.value);
     const handleImageInputChange = (e) => setImageInput(e.target.value);
@@ -103,14 +122,14 @@ export default function CreatePost({ auth }) {
         >
             <Head title="Create Post" />
             <div className="py-6">
-                <div className="max-w-2xl mx-auto px-4 space-y-6">
+                <div className="mx-auto max-w-xl px-4 sm:px-6 lg:px-8 space-y-6">
                     <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                         <h2 className="text-xl mb-4 font-medium text-gray-900 dark:text-gray-100"><Strong>Create Post</Strong></h2>
                         <Text><Strong>Preview</Strong></Text>
-                        <Post posts={createPostsObject()} auth={auth} />
+                        <Post disabled posts={posts} auth={auth} />
                     </div>
                     <div className="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                        <form onSubmit={(e) => e.preventDefault()}>
+                        <form onSubmit={submit}>
                             <Fieldset>
                                 <FieldGroup>
                                     <Field>
@@ -129,15 +148,19 @@ export default function CreatePost({ auth }) {
                                         />
                                         {errors.content ? <ErrorMessage>{errors.content}</ErrorMessage> : null}
                                     </Field>
+                                    <Field className=''>
+                                        <Label>Media Order</Label>
+                                        <PostMediaDragDrop media={media} onMediaUpdate={handleMediaUpdate}/>
+                                    </Field>
                                     <div className='flex space-x-2'>
                                         <Field className='flex-1'>
                                             <Label htmlFor="image_urls">Image URLs</Label>
-                                            {data.image_urls.map((url, index) => (
+                                            {/* {data.image_urls.map((url, index) => (
                                                 <div key={index} className='flex space-x-1'>
                                                     <Strong>{index+1}</Strong>
                                                     <Text key={index}> {url}</Text>
                                                 </div>
-                                            ))}
+                                            ))} */}
                                             {isInvalid(imageInput) && <ErrorMessage>Invalid URL</ErrorMessage>}
                                             <Input
                                                 id="image_urls"
@@ -166,12 +189,12 @@ export default function CreatePost({ auth }) {
                                     <div className='flex space-x-2'>
                                         <Field className='flex-1'>
                                             <Label htmlFor="video_urls">Video URLs</Label>
-                                            {data.video_urls.map((url, index) => (
+                                            {/* {data.video_urls.map((url, index) => (
                                                 <div key={index} className='flex space-x-1'>
                                                     <Strong>{index+1}</Strong>
                                                     <Text key={index}> {url}</Text>
                                                 </div>
-                                            ))}
+                                            ))} */}
                                             {isInvalid(videoInput) && <ErrorMessage>Invalid URL</ErrorMessage>}
                                             <Input
                                                 id="video_urls"
@@ -199,7 +222,15 @@ export default function CreatePost({ auth }) {
                                     {errors.video_urls ? <Field><ErrorMessage>{errors.video_urls}</ErrorMessage></Field> : null}
                                     <Field>
                                         <div className="flex items-center justify-end mt-4">
+                                            {postSuccess &&
+                                                <>
+                                                    <Text className="text-green-500">Post created successfully</Text>
+                                                    <Link href={`/profile/${auth.user.id}`} className="ml-4 text-sm text-gray-700 underline">View Post</Link>
+                                                </>
+                                            }
+
                                             <Button
+                                                type="submit"
                                                 disabled={data.content.length > 255 ||
                                                         data.image_urls.length + data.video_urls.length >= 10 ||
                                                         isInvalid(imageInput) ||

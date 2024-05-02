@@ -755,9 +755,11 @@ class PostsController extends Controller
      */
     public function createPost(): JsonResponse {
         $validator = Validator::make(request()->all(), [
-            'content' => 'required|string',
-            'image_urls' => 'nullable|string',
-            'video_urls' => 'nullable|string',
+            'content' => 'required|string|max:255',
+            'image_urls' => 'nullable|array',
+            'image_urls.*' => 'sometimes|url',
+            'video_urls' => 'nullable|array',
+            'video_urls.*' => 'sometimes|url',
         ]);
 
         if ($validator->fails()) {

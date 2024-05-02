@@ -8,7 +8,7 @@ import { Strong, Text } from '@/Components/CatalystComponents/text';
 import { Input } from '@/Components/CatalystComponents/input';
 import { Field, FieldGroup, Fieldset, Label, Legend, ErrorMessage } from '@/Components/CatalystComponents/fieldset';
 import Post from '@/Components/Posts/Post';
-import { set } from 'date-fns';
+import { set } from 'lodash';
 
 export default function CreatePost({ auth }) {
     const [imageInput, setImageInput] = useState('');
@@ -17,14 +17,20 @@ export default function CreatePost({ auth }) {
     const [media, setMedia] = useState([]);
     const { data, setData, post, processing, errors, reset } = useForm({
         content: '',
-        image_urls: [],
-        video_urls: [],
+        media: [],
     });
+
+    useEffect(() => {
+        data.media = media.map(mediaItem => ({
+            url: mediaItem.url,
+            type: mediaItem.type
+        }));
+        console.log(data.media.length);
+    }, [media]);
+
 
     const submit = (e) => {
         e.preventDefault();
-        setData('image_urls', media.filter((mediaItem) => mediaItem.type === 'image').map((mediaItem) => mediaItem.url));
-        setData('video_urls', media.filter((mediaItem) => mediaItem.type === 'video').map((mediaItem) => mediaItem.url));
         post(route('feed.posts.create'), {
             onSuccess: () => {
                 setPostSuccess(true);
@@ -143,7 +149,7 @@ export default function CreatePost({ auth }) {
                                             autoComplete="off"
                                             onChange={handleContentChange}
                                             disabled={processing}
-                                            invalid={data.content.length > 255}
+                                            invalid={data.content.length > 255 || processing}
                                             required
                                         />
                                         {errors.content ? <ErrorMessage>{errors.content}</ErrorMessage> : null}
@@ -170,13 +176,13 @@ export default function CreatePost({ auth }) {
                                                 autoComplete="off"
                                                 onChange={handleImageInputChange}
                                                 invalid={isInvalid(imageInput)}
-                                                disabled={data.image_urls.length + data.video_urls.length >= 10 || processing}
+                                                disabled={data.media.length >= 10 || processing}
                                             />
                                         </Field>
                                         <Field className="self-end">
                                             <Button
                                                 onClick={addImageUrl}
-                                                disabled={data.image_urls.length + data.video_urls.length >= 10 || processing || isInvalid(imageInput)}
+                                                disabled={data.media.length >= 10 || processing || isInvalid(imageInput)}
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
                                                     <path d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z" />
@@ -204,13 +210,13 @@ export default function CreatePost({ auth }) {
                                                 autoComplete="off"
                                                 onChange={handleVideoInputChange}
                                                 invalid={isInvalid(videoInput)}
-                                                disabled={data.image_urls.length + data.video_urls.length >= 10 || processing}
+                                                disabled={data.media.length >= 10 || processing}
                                             />
                                         </Field>
                                         <Field className="self-end">
                                             <Button
                                                 onClick={addVideoUrl}
-                                                disabled={data.image_urls.length + data.video_urls.length >= 10 || processing || isInvalid(videoInput)}
+                                                disabled={data.media.length >= 10 || processing || isInvalid(videoInput)}
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
                                                     <path d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z" />
@@ -232,10 +238,9 @@ export default function CreatePost({ auth }) {
                                             <Button
                                                 type="submit"
                                                 disabled={data.content.length > 255 ||
-                                                        data.image_urls.length + data.video_urls.length >= 10 ||
+                                                        data.media.length >= 10 ||
                                                         isInvalid(imageInput) ||
                                                         isInvalid(videoInput) ||
-                                                        data.content.length > 255 ||
                                                         processing
                                                     }
                                             >

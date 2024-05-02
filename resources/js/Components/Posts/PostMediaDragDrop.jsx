@@ -59,10 +59,11 @@ export default function PostMediaDragDrop({ media: initialMedia = [], onMediaUpd
 
     function handleDragEnd(event) {
         const {active, over} = event;
-
+        console.log(typeof active.id, typeof over.id)
+        console.log(active, over);
         if (active.id !== over.id) {
-            const oldIndex = media.findIndex(item => item.id === active.id);
-            const newIndex = media.findIndex(item => item.id === over.id);
+            const oldIndex = media.findIndex(item => item.id.toString() === active.id);
+            const newIndex = media.findIndex(item => item.id.toString() === over.id);
             const newMediaItems = Array.from(media);
             newMediaItems.splice(newIndex, 0, newMediaItems.splice(oldIndex, 1)[0]);
             onMediaUpdate(newMediaItems);

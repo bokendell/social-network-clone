@@ -756,10 +756,9 @@ class PostsController extends Controller
     public function createPost(): JsonResponse {
         $validator = Validator::make(request()->all(), [
             'content' => 'required|string|max:255',
-            'image_urls' => 'nullable|array',
-            'image_urls.*' => 'sometimes|url',
-            'video_urls' => 'nullable|array',
-            'video_urls.*' => 'sometimes|url',
+            'media' => 'nullable|array',
+            'media.*.url' => 'sometimes|url',
+            'media.*.type' => 'sometimes|in:image,video',
         ]);
 
         if ($validator->fails()) {
@@ -773,27 +772,23 @@ class PostsController extends Controller
             'user_id' => auth()->id(),
             'content' => request('content')
         ]);
-        if (request('image_urls')){
-            $image_urls = explode(',', request('image_urls'));
-            foreach ($image_urls as $image_url){
-                $post->images()->create([
-                    'image_url' => $image_url,
-                    'user_id' => auth()->id()
-                ]);
-            }
-        }
-        if (request('video_urls')){
-            $video_urls = explode(',', request('video_urls'));
-            foreach ($video_urls as $video_url){
-                $post->videos()->create([
-                    'video_url' => $video_url,
-                    'user_id' => auth()->id()
-                ]);
-            }
-        }
 
-        return response()->json(PostResource::make($post));
+        foreach (request('media', []) as $mediaItem) {
+        if ($mediaItem['type'] === 'image') {
+            $post->images()->create([
+                'image_url' => $mediaItem['url'],
+                'user_id' => auth()->id()
+            ]);
+        } elseif ($mediaItem['type'] === 'video') {
+            $post->videos()->create([
+                'video_url' => $mediaItem['url'],
+                'user_id' => auth()->id()
+            ]);
+        }
     }
+
+    return response()->json(PostResource::make($post));
+}
 
     /**
      * @OA\Delete(
